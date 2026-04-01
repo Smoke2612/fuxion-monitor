@@ -1,1 +1,1559 @@
-# fuxion-monitor
+# fuxion-monitor[index-14.html](https://github.com/user-attachments/files/26394789/index-14.html)
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FuXion · Brand Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c0f;
+  --bg2: #111418;
+  --bg3: #181d23;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8eaed;
+  --text2: #8b9099;
+  --text3: #555d6b;
+  --accent: #00e5a0;
+  --accent2: #00b87a;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --purple: #a78bfa;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --r: 10px;
+  --r2: 16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+/* SIDEBAR */
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+.logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+.logo-name { font-size: 15px; font-weight: 600; color: var(--accent); letter-spacing: .02em; }
+.logo-sub { font-size: 10px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+.nav { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--r); cursor: pointer; color: var(--text2); font-size: 13px; transition: all .15s; user-select: none; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(0,229,160,.08); color: var(--accent); }
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; font-size: 10px; background: var(--danger); color: #fff; border-radius: 999px; padding: 1px 6px; font-weight: 600; }
+.sidebar-bottom { padding: 12px 8px; border-top: 1px solid var(--border); }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; margin-right: 6px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* MAIN */
+.main { margin-left: 220px; flex: 1; min-height: 100vh; }
+.topbar { padding: 16px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg2); position: sticky; top: 0; z-index: 50; }
+.page-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.page-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.content { padding: 24px 28px; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--r); border: 1px solid var(--border2); background: transparent; color: var(--text); font-size: 12px; font-family: var(--font); cursor: pointer; transition: all .15s; font-weight: 500; }
+.btn:hover { background: var(--bg3); border-color: rgba(255,255,255,.2); }
+.btn-accent { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+.btn-accent:hover { background: var(--accent2); border-color: var(--accent2); }
+.btn-danger { background: rgba(239,68,68,.1); color: var(--danger); border-color: rgba(239,68,68,.3); }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+
+/* CARDS */
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; }
+.card-sm { padding: 14px 16px; border-radius: var(--r); }
+
+/* METRICS */
+.metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+.metric { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 18px 20px; }
+.metric-label { font-size: 11px; color: var(--text3); margin-bottom: 8px; font-family: var(--mono); letter-spacing: .05em; text-transform: uppercase; }
+.metric-val { font-size: 28px; font-weight: 600; color: var(--text); line-height: 1; }
+.metric-delta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.metric-accent { border-color: rgba(0,229,160,.2); }
+.metric-accent .metric-val { color: var(--accent); }
+.metric-warn .metric-val { color: var(--warn); }
+.metric-danger .metric-accent .metric-val, .metric.danger .metric-val { color: var(--danger); }
+
+/* TABS */
+.tabs { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 3px; margin-bottom: 20px; width: fit-content; }
+.tab { padding: 7px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; color: var(--text2); transition: all .12s; font-weight: 500; }
+.tab.on { background: var(--bg3); color: var(--text); }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; padding: 10px 14px; color: var(--text3); font-size: 10px; font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 500; }
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,.02); }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 3px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+.b-green { background: rgba(0,229,160,.1); color: var(--accent); }
+.b-warn { background: rgba(245,158,11,.1); color: var(--warn); }
+.b-danger { background: rgba(239,68,68,.1); color: var(--danger); }
+.b-purple { background: rgba(167,139,250,.1); color: var(--purple); }
+.b-info { background: rgba(59,130,246,.1); color: var(--info); }
+.b-gray { background: rgba(255,255,255,.05); color: var(--text2); }
+
+/* FORMS */
+input[type=text], input[type=email], input[type=url], textarea, select {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: var(--r); padding: 9px 12px; font-size: 13px; font-family: var(--font); width: 100%; transition: border-color .15s; outline: none;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+select option { background: var(--bg3); }
+.form-row { display: grid; gap: 12px; margin-bottom: 14px; }
+.form-row-2 { grid-template-columns: 1fr 1fr; }
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+label { display: block; font-size: 11px; color: var(--text3); margin-bottom: 5px; font-family: var(--mono); letter-spacing: .04em; }
+.section-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+
+/* SEARCH BAR */
+.search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-bar input { flex: 1; }
+
+/* PRODUCT CARD */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.product-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 14px; position: relative; transition: border-color .15s; cursor: default; }
+.product-card:hover { border-color: var(--border2); }
+.product-img { width: 100%; height: 120px; object-fit: cover; border-radius: var(--r); background: var(--bg3); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; }
+.product-img img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--r); }
+.product-img-placeholder { color: var(--text3); font-size: 24px; }
+.product-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.product-sku { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-bottom: 8px; }
+.product-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.product-actions { display: flex; gap: 6px; margin-top: 10px; }
+.product-delete { position: absolute; top: 10px; right: 10px; background: rgba(239,68,68,.1); border: none; color: var(--danger); width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s; }
+.product-card:hover .product-delete { opacity: 1; }
+
+/* ALERT ITEM */
+.alert-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 14px 16px; margin-bottom: 8px; display: grid; grid-template-columns: 8px 1fr auto; gap: 14px; align-items: start; }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.alert-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.alert-meta { font-size: 11px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+.alert-snippet { font-size: 11px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+.alert-snippet mark { background: rgba(245,158,11,.2); color: var(--warn); border-radius: 2px; padding: 0 2px; }
+.alert-actions { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex-shrink: 0; }
+
+/* MP GRID */
+.mp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; max-height: 220px; overflow-y: auto; padding: 2px; }
+.mp-chip { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; font-size: 11px; color: var(--text2); background: var(--bg2); transition: all .12s; user-select: none; }
+.mp-chip.on { border-color: rgba(0,229,160,.4); background: rgba(0,229,160,.06); color: var(--accent); }
+.mp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* REGION TABS */
+.rtabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.rtab { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border); font-size: 11px; cursor: pointer; color: var(--text2); transition: all .12s; user-select: none; }
+.rtab.on { background: rgba(0,229,160,.08); border-color: rgba(0,229,160,.3); color: var(--accent); }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--r2); padding: 24px; width: 100%; max-width: 560px; max-height: 80vh; overflow-y: auto; }
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* AI PANEL */
+.ai-panel { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-top: 16px; }
+.ai-header { font-size: 11px; color: var(--accent); font-family: var(--mono); letter-spacing: .06em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.ai-text { font-size: 12px; color: var(--text2); line-height: 1.7; }
+
+/* LOADING */
+.dots { display: inline-flex; gap: 3px; }
+.dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); animation: dp 1.2s ease-in-out infinite; }
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes dp { 0%,80%,100%{opacity:.2}40%{opacity:1} }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* IMAGE UPLOAD */
+.upload-area { border: 2px dashed var(--border2); border-radius: var(--r); padding: 24px; text-align: center; cursor: pointer; transition: border-color .15s; }
+.upload-area:hover { border-color: var(--accent); }
+.upload-area input { display: none; }
+.img-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+.img-preview { position: relative; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; background: var(--bg3); }
+.img-preview img { width: 100%; height: 100%; object-fit: cover; }
+.img-preview-del { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,.7); border: none; color: #fff; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+
+/* EXPORT */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+.empty-icon { font-size: 32px; margin-bottom: 10px; }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* SCAN PROGRESS */
+.scan-progress { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-bottom: 16px; }
+.progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .3s; }
+
+/* VARIANTS */
+.variant-tag { display: inline-flex; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; font-size: 10px; color: var(--text2); margin: 2px; }
+
+/* LINK */
+a.link { color: var(--info); text-decoration: none; font-size: 11px; }
+a.link:hover { text-decoration: underline; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sidebar { width: 56px; }
+  .sidebar .logo-name, .sidebar .logo-sub, .nav-item span, .nav-badge { display: none; }
+  .main { margin-left: 56px; }
+  .metrics-row { grid-template-columns: repeat(2, 1fr); }
+  .form-row-4 { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-name">FuXion Monitor</div>
+    <div class="logo-sub">Brand Protection v1.0</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="showPage('catalog')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/></svg>
+      <span>Catálogo</span>
+    </div>
+    <div class="nav-item" onclick="showPage('scan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span>Escanear</span>
+    </div>
+    <div class="nav-item" onclick="showPage('alerts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span>Alertas</span>
+      <span class="nav-badge" id="alert-badge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('findings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>Hallazgos</span>
+    </div>
+    <div class="nav-item" onclick="showPage('marketplaces')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+      <span>Marketplaces</span>
+    </div>
+    <div class="nav-item" onclick="showPage('config')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>Configuración</span>
+    </div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div style="font-size:10px;color:var(--text3);display:flex;align-items:center;padding:0 4px">
+      <span class="status-dot"></span><span>Sistema activo</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ==================== DASHBOARD ==================== -->
+<div class="page active" id="page-dashboard">
+  <div class="topbar">
+    <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-date">Cargando...</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-accent" onclick="showPage('scan')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Nuevo escaneo
+      </button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="metrics-row">
+      <div class="metric metric-accent">
+        <div class="metric-label">Productos registrados</div>
+        <div class="metric-val" id="d-products">0</div>
+        <div class="metric-delta">en catálogo activo</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Hallazgos totales</div>
+        <div class="metric-val" id="d-findings">0</div>
+        <div class="metric-delta">desde el inicio</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Alertas activas</div>
+        <div class="metric-val" id="d-alerts" style="color:var(--warn)">0</div>
+        <div class="metric-delta">requieren revisión</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Último escaneo</div>
+        <div class="metric-val" style="font-size:16px" id="d-lastscan">—</div>
+        <div class="metric-delta" id="d-lastscan-mp">—</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="section-title">Hallazgos recientes</div>
+        <div id="dash-recent-findings">
+          <div class="empty-state"><div class="empty-icon">🔍</div><div>Sin hallazgos aún. Ejecuta un escaneo.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Alertas prioritarias</div>
+        <div id="dash-alerts-preview">
+          <div class="empty-state"><div class="empty-icon">✅</div><div>Sin alertas activas.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-title">Distribución por marketplace</div>
+      <div id="dash-mp-chart" style="display:flex;gap:6px;flex-wrap:wrap;padding-top:4px">
+        <div style="color:var(--text3);font-size:12px">Ejecuta un escaneo para ver la distribución.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CATALOG ==================== -->
+<div class="page" id="page-catalog">
+  <div class="topbar">
+    <div><div class="page-title">Catálogo de productos</div><div class="page-sub">Registra marcas, productos e imágenes oficiales</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-accent" onclick="openProductModal()">+ Agregar producto</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="search-bar">
+      <input type="text" id="catalog-search" placeholder="Buscar producto..." oninput="renderCatalog()">
+      <select style="width:160px" id="catalog-filter" onchange="renderCatalog()">
+        <option value="all">Todas las categorías</option>
+        <option value="suplemento">Suplemento</option>
+        <option value="bebida">Bebida</option>
+        <option value="kit">Kit/Pack</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="product-grid" id="product-grid">
+      <div style="grid-column:1/-1" class="empty-state"><div class="empty-icon">📦</div><div>Agrega tus productos para comenzar a monitorear.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCAN ==================== -->
+<div class="page" id="page-scan">
+  <div class="topbar">
+    <div><div class="page-title">Escanear marketplaces</div><div class="page-sub">Detecta menciones, imágenes alteradas y vendedores no autorizados</div></div>
+  </div>
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:20px">
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Productos a monitorear</div>
+          <div id="scan-product-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+            <div style="color:var(--text3);font-size:12px">Agrega productos al catálogo primero.</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm" onclick="selectAllScanProducts()">Seleccionar todos</button>
+            <button class="btn btn-sm" onclick="clearScanProducts()">Limpiar</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Marketplaces objetivo</div>
+          <div class="rtabs" id="scan-rtabs">
+            <div class="rtab on" data-r="all" onclick="setScanRegion(this)">Global</div>
+            <div class="rtab" data-r="latam" onclick="setScanRegion(this)">LATAM</div>
+            <div class="rtab" data-r="na" onclick="setScanRegion(this)">Norteamérica</div>
+            <div class="rtab" data-r="eu" onclick="setScanRegion(this)">Europa</div>
+            <div class="rtab" data-r="asia" onclick="setScanRegion(this)">Asia</div>
+            <div class="rtab" data-r="mena" onclick="setScanRegion(this)">MENA</div>
+            <div class="rtab" data-r="africa" onclick="setScanRegion(this)">África</div>
+          </div>
+          <div class="mp-grid" id="scan-mp-grid"></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-sm" onclick="selectAllScanMp()">Todos</button>
+            <button class="btn btn-sm" onclick="clearScanMp()">Ninguno</button>
+            <span style="font-size:11px;color:var(--text3);margin-left:4px;align-self:center" id="mp-sel-count"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Opciones de detección</div>
+          <div class="form-row form-row-2">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="opt-text" checked> <span style="color:var(--text);font-size:13px">Búsqueda por texto (nombre + variantes)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="opt-image" checked> <span style="color:var(--text);font-size:13px">Detección de imágenes alteradas</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="opt-variants" checked> <span style="color:var(--text);font-size:13px">Variantes de nombre (l33t, typos, símbolos)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="opt-price" checked> <span style="color:var(--text);font-size:13px">Alerta por precio anómalo (&lt;60% precio base)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Resumen del escaneo</div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Productos</span><span id="scan-sum-products" style="font-weight:600">0 seleccionados</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Marketplaces</span><span id="scan-sum-mp" style="font-weight:600">0 seleccionados</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Variantes texto</span><span id="scan-sum-variants" style="font-weight:600">0 términos</span></div>
+            <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between"><span style="color:var(--text2)">Est. resultados</span><span id="scan-sum-est" style="color:var(--accent);font-weight:600">—</span></div>
+          </div>
+          <button class="btn btn-accent" style="width:100%;margin-top:16px;justify-content:center;padding:12px" onclick="runScan()" id="scan-btn">
+            Iniciar escaneo
+          </button>
+        </div>
+
+        <div class="card" id="scan-progress-card" style="display:none">
+          <div class="section-title">Progreso</div>
+          <div id="scan-log" style="font-size:11px;color:var(--text2);line-height:2;font-family:var(--mono)"></div>
+          <div class="progress-bar" style="margin-top:12px"><div class="progress-fill" id="scan-progress-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scan-results-section" style="display:none;margin-top:20px">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="section-title" style="margin:0" id="scan-results-title">Resultados</div>
+          <div style="display:flex;gap:8px">
+            <select style="width:160px;font-size:11px" id="res-filter-type" onchange="renderScanResults()">
+              <option value="all">Todos los tipos</option>
+              <option value="unauthorized">No autorizados</option>
+              <option value="suspicious">Sospechosos</option>
+              <option value="reseller">Revendedores</option>
+              <option value="official">Oficiales</option>
+            </select>
+            <select style="width:160px;font-size:11px" id="res-filter-mp" onchange="renderScanResults()">
+              <option value="all">Todos los MP</option>
+            </select>
+            <button class="btn btn-sm" onclick="saveAllFindings()">Guardar hallazgos</button>
+            <button class="btn btn-sm" onclick="exportCSV()">Exportar CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Marketplace</th>
+                <th>Título del listado</th>
+                <th>Vendedor</th>
+                <th>País</th>
+                <th>Precio</th>
+                <th>Tipo</th>
+                <th>Alerta</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="scan-results-body"></tbody>
+          </table>
+        </div>
+        <div class="ai-panel" id="scan-ai-panel" style="display:none">
+          <div class="ai-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            ANÁLISIS IA
+          </div>
+          <div class="ai-text" id="scan-ai-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ALERTS ==================== -->
+<div class="page" id="page-alerts">
+  <div class="topbar">
+    <div><div class="page-title">Alertas activas</div><div class="page-sub">Listados que requieren verificación y acción inmediata</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" onclick="clearAllAlerts()">Marcar todo como revisado</button>
+      <button class="btn btn-sm" onclick="exportAlertsReport()">Exportar reporte</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <select style="width:160px" id="alert-filter-type" onchange="renderAlerts()">
+        <option value="all">Todos los tipos</option>
+        <option value="unauthorized">No autorizados</option>
+        <option value="suspicious">Sospechosos</option>
+        <option value="image_tamper">Imagen alterada</option>
+        <option value="price_anomaly">Precio anómalo</option>
+      </select>
+      <select style="width:160px" id="alert-filter-mp" onchange="renderAlerts()">
+        <option value="all">Todos los MP</option>
+      </select>
+      <select style="width:160px" id="alert-filter-country" onchange="renderAlerts()">
+        <option value="all">Todos los países</option>
+      </select>
+    </div>
+    <div id="alerts-list">
+      <div class="empty-state"><div class="empty-icon">✅</div><div>Sin alertas activas. Ejecuta un escaneo primero.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FINDINGS ==================== -->
+<div class="page" id="page-findings">
+  <div class="topbar">
+    <div><div class="page-title">Historial de hallazgos</div><div class="page-sub">Registro completo de todas las detecciones</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" onclick="exportCSVFindings()">Exportar CSV</button>
+      <button class="btn btn-danger btn-sm" onclick="clearFindings()">Limpiar historial</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <input type="text" id="findings-search" placeholder="Buscar..." style="width:200px" oninput="renderFindings()">
+      <select style="width:160px" id="findings-filter-type" onchange="renderFindings()">
+        <option value="all">Todos los tipos</option>
+        <option value="unauthorized">No autorizados</option>
+        <option value="suspicious">Sospechosos</option>
+        <option value="reseller">Revendedores</option>
+        <option value="official">Oficiales</option>
+      </select>
+      <select style="width:180px" id="findings-filter-mp" onchange="renderFindings()">
+        <option value="all">Todos los marketplaces</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Producto</th>
+              <th>Marketplace</th>
+              <th>Título</th>
+              <th>País</th>
+              <th>Precio</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="findings-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MARKETPLACES ==================== -->
+<div class="page" id="page-marketplaces">
+  <div class="topbar">
+    <div><div class="page-title">Gestión de marketplaces</div><div class="page-sub">Configura y agrega plataformas de monitoreo</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-accent" onclick="openMpModal()">+ Agregar marketplace</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Marketplace</th><th>Región</th><th>URL</th><th>Estado</th><th>Tipo</th><th></th></tr>
+          </thead>
+          <tbody id="mp-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONFIG ==================== -->
+<div class="page" id="page-config">
+  <div class="topbar">
+    <div><div class="page-title">Configuración</div><div class="page-sub">Ajustes de la herramienta y notificaciones</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-accent" onclick="saveConfig()">Guardar cambios</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card">
+        <div class="section-title">Información de la empresa</div>
+        <div class="form-row"><label>Nombre de la empresa</label><input type="text" id="cfg-company" value="FuXion Biotech"></div>
+        <div class="form-row"><label>Email de alertas</label><input type="email" id="cfg-email" placeholder="compliance@empresa.com"></div>
+        <div class="form-row"><label>Responsable de IP</label><input type="text" id="cfg-responsible" placeholder="Nombre del responsable"></div>
+        <div class="form-row"><label>Países de operación</label><input type="text" id="cfg-countries" placeholder="PE, CO, MX, CL, AR..."></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Umbrales de alerta</div>
+        <div class="form-row"><label>Precio anómalo (% del precio base)</label><input type="text" id="cfg-price-threshold" value="60" placeholder="60"></div>
+        <div class="form-row"><label>Similitud de imagen (% mínimo para alerta)</label><input type="text" id="cfg-img-threshold" value="75" placeholder="75"></div>
+        <div class="form-row"><label>Calificación mínima sospechosa</label><input type="text" id="cfg-rating-threshold" value="3.5" placeholder="3.5"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Variantes automáticas de nombres</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">El sistema genera automáticamente estas variantes de cada nombre de producto para detectar evasiones:</div>
+        <div id="variant-examples" style="line-height:2.2"></div>
+        <div class="form-row" style="margin-top:12px"><label>Términos adicionales a excluir</label><input type="text" id="cfg-exclude" placeholder="Palabras separadas por coma"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Datos guardados</div>
+        <div id="storage-stats" style="font-size:12px;color:var(--text2);line-height:2"></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-sm" onclick="exportAllData()">Exportar todo</button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">Borrar todos los datos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end layout -->
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="product-modal" style="display:none" onclick="if(event.target===this)closeProductModal()">
+  <div class="modal">
+    <div class="modal-title">Agregar producto</div>
+    <div class="form-row form-row-2">
+      <div><label>Nombre oficial *</label><input type="text" id="p-name" placeholder="FuXion XFuel"></div>
+      <div><label>SKU / Código</label><input type="text" id="p-sku" placeholder="FX-001"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Categoría</label>
+        <select id="p-cat">
+          <option value="suplemento">Suplemento</option>
+          <option value="bebida">Bebida</option>
+          <option value="kit">Kit/Pack</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div><label>Precio base (USD)</label><input type="text" id="p-price" placeholder="29.99"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Nombres alternativos / variantes conocidas</label><input type="text" id="p-aliases" placeholder="XFuel, X Fuel, xfuel... (separados por coma)"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Países de venta autorizada</label><input type="text" id="p-countries" placeholder="PE, CO, MX, CL, AR, EC..."></div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Imágenes oficiales del producto</label>
+        <div class="upload-area" onclick="document.getElementById('p-img-input').click()">
+          <input type="file" id="p-img-input" accept="image/*" multiple onchange="handleImageUpload(this)">
+          <div style="color:var(--text3);font-size:12px">Haz clic o arrastra imágenes aquí<br><span style="font-size:10px">PNG, JPG — las imágenes se usan para detectar copias alteradas</span></div>
+        </div>
+        <div class="img-preview-grid" id="img-preview-grid"></div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div><label>Descripción / notas</label><textarea id="p-desc" rows="2" placeholder="Notas sobre el producto, ingredientes clave, empaque..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeProductModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveProduct()">Guardar producto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MP Modal -->
+<div class="modal-overlay" id="mp-modal" style="display:none" onclick="if(event.target===this)closeMpModal()">
+  <div class="modal">
+    <div class="modal-title">Agregar marketplace</div>
+    <div class="form-row form-row-2">
+      <div><label>Nombre *</label><input type="text" id="mp-name" placeholder="Plaza Vea"></div>
+      <div><label>URL</label><input type="url" id="mp-url" placeholder="https://www.plazavea.com.pe"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Región</label>
+        <select id="mp-region">
+          <option value="latam">Latinoamérica</option>
+          <option value="na">Norteamérica</option>
+          <option value="eu">Europa</option>
+          <option value="asia">Asia-Pacífico</option>
+          <option value="mena">Medio Oriente</option>
+          <option value="africa">África</option>
+          <option value="all">Global</option>
+        </select>
+      </div>
+      <div><label>País principal</label><input type="text" id="mp-country" placeholder="PE"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Ícono (emoji)</label><input type="text" id="mp-icon" placeholder="🏪" style="font-size:18px"></div>
+      <div><label>Color de marca</label><input type="color" id="mp-color" value="#00e5a0" style="height:42px;cursor:pointer"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeMpModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveMp()">Agregar marketplace</button>
+    </div>
+  </div>
+</div>
+
+<!-- Finding Detail Modal -->
+<div class="modal-overlay" id="finding-modal" style="display:none" onclick="if(event.target===this)closeFindingModal()">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-title">Detalle del hallazgo</div>
+    <div id="finding-detail-content"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeFindingModal()">Cerrar</button>
+      <button class="btn btn-danger" onclick="markAsReviewed()">Marcar como revisado</button>
+      <button class="btn btn-accent" onclick="escalateFinding()">Escalar para acción</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== DATA STORE ======================
+const DB = {
+  get(k,def=[]) { try { return JSON.parse(localStorage.getItem('fuxion_'+k)) ?? def; } catch { return def; } },
+  set(k,v) { localStorage.setItem('fuxion_'+k, JSON.stringify(v)); },
+};
+
+let products = DB.get('products', []);
+let findings = DB.get('findings', []);
+let alerts = DB.get('alerts', []);
+let customMps = DB.get('custom_mps', []);
+let config = DB.get('config', { company:'FuXion Biotech', email:'', responsible:'', countries:'PE,CO,MX,CL,AR', priceThreshold:60, imgThreshold:75, ratingThreshold:3.5 });
+let tempImages = [];
+let scanResults = [];
+let activeFinding = null;
+let scanSelProducts = new Set();
+let scanSelMp = new Set();
+let scanRegion = 'all';
+
+// ====================== MARKETPLACE DATA ======================
+const PRESET_MP = [
+  {id:'plazavea',n:'Plaza Vea',e:'🏬',c:'#E30613',r:'latam',country:'PE',url:'https://www.plazavea.com.pe',preset:true},
+  {id:'sodimac',n:'Sodimac',e:'🔧',c:'#F47920',r:'latam',country:'PE/CL/CO',url:'https://www.sodimac.com.pe',preset:true},
+  {id:'saga',n:'Saga Falabella',e:'🛍️',c:'#009B77',r:'latam',country:'PE',url:'https://www.falabella.com.pe',preset:true},
+  {id:'ripley',n:'Ripley',e:'🏪',c:'#D63384',r:'latam',country:'PE/CL/CO',url:'https://www.ripley.com.pe',preset:true},
+  {id:'tottus',n:'Tottus',e:'🛒',c:'#00853F',r:'latam',country:'PE/CL',url:'https://www.tottus.com.pe',preset:true},
+  {id:'wong',n:'Wong',e:'🛒',c:'#E2001A',r:'latam',country:'PE',url:'https://www.wong.pe',preset:true},
+  {id:'mercadolibre',n:'Mercado Libre',e:'🛍️',c:'#FFE600',r:'latam',country:'LATAM',url:'https://www.mercadolibre.com',preset:true},
+  {id:'amazon_mx',n:'Amazon MX',e:'🛒',c:'#FF9900',r:'latam',country:'MX',url:'https://www.amazon.com.mx',preset:true},
+  {id:'amazon_br',n:'Amazon BR',e:'🛒',c:'#FF9900',r:'latam',country:'BR',url:'https://www.amazon.com.br',preset:true},
+  {id:'falabella',n:'Falabella',e:'🏬',c:'#6FCF97',r:'latam',country:'CL/CO/PE',url:'https://www.falabella.com',preset:true},
+  {id:'liverpool',n:'Liverpool',e:'🎯',c:'#CC0000',r:'latam',country:'MX',url:'https://www.liverpool.com.mx',preset:true},
+  {id:'linio',n:'Linio',e:'📦',c:'#FF5A00',r:'latam',country:'CO/PE/MX',url:'https://www.linio.com',preset:true},
+  {id:'rappi',n:'Rappi',e:'🛵',c:'#FF441F',r:'latam',country:'LATAM',url:'https://www.rappi.com',preset:true},
+  {id:'exito',n:'Éxito',e:'🇨🇴',c:'#FFCD00',r:'latam',country:'CO',url:'https://www.exito.com',preset:true},
+  {id:'amazon_us',n:'Amazon US',e:'🛒',c:'#FF9900',r:'na',country:'US',url:'https://www.amazon.com',preset:true},
+  {id:'ebay',n:'eBay',e:'🏪',c:'#E53238',r:'na',country:'US',url:'https://www.ebay.com',preset:true},
+  {id:'walmart_us',n:'Walmart US',e:'🏢',c:'#0071CE',r:'na',country:'US',url:'https://www.walmart.com',preset:true},
+  {id:'amazon_eu',n:'Amazon EU',e:'🛒',c:'#FF9900',r:'eu',country:'EU',url:'https://www.amazon.es',preset:true},
+  {id:'aliexpress',n:'AliExpress',e:'🛍️',c:'#E62A2A',r:'asia',country:'CN',url:'https://www.aliexpress.com',preset:true},
+  {id:'shopee',n:'Shopee',e:'🛒',c:'#EE4D2D',r:'asia',country:'SEA',url:'https://www.shopee.com',preset:true},
+  {id:'noon',n:'Noon',e:'🌙',c:'#F5C518',r:'mena',country:'AE',url:'https://www.noon.com',preset:true},
+  {id:'jumia',n:'Jumia',e:'🌍',c:'#F68B1E',r:'africa',country:'NG/KE',url:'https://www.jumia.com',preset:true},
+];
+
+function allMps() { return [...PRESET_MP, ...customMps]; }
+
+// ====================== NAVIGATION ======================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const items = document.querySelectorAll('.nav-item');
+  const pages = ['dashboard','catalog','scan','alerts','findings','marketplaces','config'];
+  const idx = pages.indexOf(id);
+  if (idx >= 0) items[idx].classList.add('active');
+  if (id === 'scan') initScanPage();
+  if (id === 'marketplaces') renderMpTable();
+  if (id === 'findings') renderFindings();
+  if (id === 'alerts') renderAlerts();
+  if (id === 'config') renderConfig();
+  if (id === 'dashboard') renderDashboard();
+}
+
+// ====================== DASHBOARD ======================
+function renderDashboard() {
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('es', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('d-products').textContent = products.length;
+  document.getElementById('d-findings').textContent = findings.length;
+  const activeAlerts = alerts.filter(a => !a.reviewed);
+  document.getElementById('d-alerts').textContent = activeAlerts.length;
+  const lastScan = findings.length ? findings[findings.length-1] : null;
+  document.getElementById('d-lastscan').textContent = lastScan ? new Date(lastScan.date).toLocaleDateString('es') : '—';
+  document.getElementById('d-lastscan-mp').textContent = lastScan ? lastScan.mp : '—';
+  updateAlertBadge();
+
+  // Recent findings
+  const recent = [...findings].reverse().slice(0, 5);
+  const rfEl = document.getElementById('dash-recent-findings');
+  if (!recent.length) {
+    rfEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div>Sin hallazgos aún.</div></div>';
+  } else {
+    rfEl.innerHTML = recent.map(f => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:12px;font-weight:500">${f.title}</div>
+          <div style="font-size:10px;color:var(--text3)">${f.mp} · ${f.country} · ${new Date(f.date).toLocaleDateString('es')}</div>
+        </div>
+        ${typeBadge(f.type)}
+      </div>`).join('');
+  }
+
+  // Alerts preview
+  const alertsEl = document.getElementById('dash-alerts-preview');
+  const urgentAlerts = activeAlerts.slice(0, 4);
+  if (!urgentAlerts.length) {
+    alertsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><div>Sin alertas activas.</div></div>';
+  } else {
+    alertsEl.innerHTML = urgentAlerts.map(a => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:12px;font-weight:500">${a.title}</div>
+          <div style="font-size:10px;color:var(--text3)">${a.mp} · ${a.country}</div>
+        </div>
+        <span class="badge b-danger">${a.alertType}</span>
+      </div>`).join('');
+  }
+
+  // MP chart
+  const mpChart = document.getElementById('dash-mp-chart');
+  if (!findings.length) {
+    mpChart.innerHTML = '<div style="color:var(--text3);font-size:12px">Ejecuta un escaneo para ver la distribución.</div>';
+  } else {
+    const mpCounts = {};
+    findings.forEach(f => { mpCounts[f.mp] = (mpCounts[f.mp]||0)+1; });
+    const sorted = Object.entries(mpCounts).sort((a,b)=>b[1]-a[1]);
+    const max = sorted[0][1];
+    mpChart.innerHTML = sorted.map(([mp, cnt]) => `
+      <div style="flex:1;min-width:80px;max-width:140px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap">${mp}</div>
+        <div style="background:var(--bg3);border-radius:4px;overflow:hidden;height:6px">
+          <div style="width:${Math.round(cnt/max*100)}%;height:100%;background:var(--accent);border-radius:4px"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text2);margin-top:2px">${cnt}</div>
+      </div>`).join('');
+  }
+}
+
+// ====================== PRODUCTS ======================
+function openProductModal() {
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-sku').value = '';
+  document.getElementById('p-price').value = '';
+  document.getElementById('p-aliases').value = '';
+  document.getElementById('p-countries').value = config.countries || 'PE,CO,MX,CL,AR';
+  document.getElementById('p-desc').value = '';
+  document.getElementById('img-preview-grid').innerHTML = '';
+  tempImages = [];
+  document.getElementById('product-modal').style.display = 'flex';
+}
+function closeProductModal() { document.getElementById('product-modal').style.display = 'none'; }
+
+function handleImageUpload(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      tempImages.push({ name: file.name, data: e.target.result });
+      renderImgPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderImgPreviews() {
+  document.getElementById('img-preview-grid').innerHTML = tempImages.map((img, i) => `
+    <div class="img-preview">
+      <img src="${img.data}" alt="${img.name}">
+      <button class="img-preview-del" onclick="removeImg(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeImg(i) { tempImages.splice(i, 1); renderImgPreviews(); }
+
+function saveProduct() {
+  const name = document.getElementById('p-name').value.trim();
+  if (!name) { alert('El nombre es obligatorio.'); return; }
+  const product = {
+    id: 'p_' + Date.now(),
+    name,
+    sku: document.getElementById('p-sku').value.trim(),
+    category: document.getElementById('p-cat').value,
+    price: parseFloat(document.getElementById('p-price').value) || 0,
+    aliases: document.getElementById('p-aliases').value.split(',').map(s=>s.trim()).filter(Boolean),
+    countries: document.getElementById('p-countries').value.trim(),
+    description: document.getElementById('p-desc').value.trim(),
+    images: [...tempImages],
+    created: new Date().toISOString(),
+  };
+  products.push(product);
+  DB.set('products', products);
+  closeProductModal();
+  renderCatalog();
+  updateAlertBadge();
+}
+
+function deleteProduct(id) {
+  if (!confirm('¿Eliminar este producto del catálogo?')) return;
+  products = products.filter(p => p.id !== id);
+  DB.set('products', products);
+  renderCatalog();
+}
+
+function renderCatalog() {
+  const q = document.getElementById('catalog-search').value.toLowerCase();
+  const cat = document.getElementById('catalog-filter').value;
+  const grid = document.getElementById('product-grid');
+  let filtered = products.filter(p =>
+    (cat === 'all' || p.category === cat) &&
+    (!q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q))
+  );
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1" class="empty-state"><div class="empty-icon">📦</div><div>Agrega productos para comenzar.</div></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card">
+      <button class="product-delete" onclick="deleteProduct('${p.id}')">✕</button>
+      <div class="product-img">
+        ${p.images && p.images.length ? `<img src="${p.images[0].data}" alt="${p.name}">` : `<span class="product-img-placeholder">📦</span>`}
+      </div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-sku">${p.sku || 'Sin SKU'} · ${p.category}</div>
+      <div class="product-tags">
+        ${p.countries ? `<span class="badge b-info">${p.countries}</span>` : ''}
+        ${p.price ? `<span class="badge b-gray">USD ${p.price}</span>` : ''}
+        ${p.images && p.images.length ? `<span class="badge b-green">${p.images.length} img</span>` : ''}
+      </div>
+      ${p.aliases && p.aliases.length ? `<div style="font-size:10px;color:var(--text3);margin-top:6px">También: ${p.aliases.join(', ')}</div>` : ''}
+    </div>`).join('');
+}
+
+// ====================== SCAN ======================
+function initScanPage() {
+  // Product chips
+  const pList = document.getElementById('scan-product-list');
+  if (!products.length) {
+    pList.innerHTML = '<div style="color:var(--text3);font-size:12px">Agrega productos al catálogo primero.</div>';
+    scanSelProducts = new Set();
+  } else {
+    scanSelProducts = new Set(products.map(p => p.id));
+    pList.innerHTML = products.map(p => `
+      <div class="mp-chip on" data-id="${p.id}" onclick="toggleScanProduct(this)" style="max-width:200px">
+        ${p.name}
+      </div>`).join('');
+  }
+  buildScanMpGrid();
+  updateScanSummary();
+}
+
+function toggleScanProduct(el) {
+  const id = el.dataset.id;
+  if (scanSelProducts.has(id)) { scanSelProducts.delete(id); el.classList.remove('on'); }
+  else { scanSelProducts.add(id); el.classList.add('on'); }
+  updateScanSummary();
+}
+
+function selectAllScanProducts() {
+  scanSelProducts = new Set(products.map(p => p.id));
+  document.querySelectorAll('#scan-product-list .mp-chip').forEach(c => c.classList.add('on'));
+  updateScanSummary();
+}
+function clearScanProducts() {
+  scanSelProducts.clear();
+  document.querySelectorAll('#scan-product-list .mp-chip').forEach(c => c.classList.remove('on'));
+  updateScanSummary();
+}
+
+function buildScanMpGrid() {
+  const vis = scanRegion === 'all' ? allMps() : allMps().filter(m => m.r === scanRegion);
+  scanSelMp = new Set(vis.map(m => m.id));
+  document.getElementById('scan-mp-grid').innerHTML = vis.map(m => `
+    <div class="mp-chip on" data-id="${m.id}" onclick="toggleScanMp(this)">
+      <span class="mp-dot" style="background:${m.c}"></span>${m.n}
+    </div>`).join('');
+  updateScanSummary();
+}
+
+function toggleScanMp(el) {
+  const id = el.dataset.id;
+  if (scanSelMp.has(id)) { scanSelMp.delete(id); el.classList.remove('on'); }
+  else { scanSelMp.add(id); el.classList.add('on'); }
+  updateScanSummary();
+}
+function selectAllScanMp() { document.querySelectorAll('#scan-mp-grid .mp-chip').forEach(c => { c.classList.add('on'); scanSelMp.add(c.dataset.id); }); updateScanSummary(); }
+function clearScanMp() { scanSelMp.clear(); document.querySelectorAll('#scan-mp-grid .mp-chip').forEach(c => c.classList.remove('on')); updateScanSummary(); }
+
+function setScanRegion(el) {
+  document.querySelectorAll('#scan-rtabs .rtab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  scanRegion = el.dataset.r;
+  buildScanMpGrid();
+}
+
+function generateVariants(name) {
+  const n = name.toLowerCase();
+  const variants = [name, n];
+  variants.push(n.replace(/\s+/g, ''));
+  variants.push(n.replace(/\s+/g, '_'));
+  variants.push(n.replace(/\s+/g, '-'));
+  variants.push(n.replace(/o/g,'0').replace(/i/g,'1').replace(/e/g,'3').replace(/a/g,'4'));
+  variants.push(n.replace(/x/g,'×').replace(/a/g,'@'));
+  if (n.includes('fuxion')) {
+    variants.push('fuxion','fu×ion','fux1on','f.u.x.i.o.n','fuxíon','fuxîon','fuxïon','fu-xion','superfuxion','fuxionpro','fuxion oficial','fuxion original');
+  }
+  return [...new Set(variants)].filter(v => v.length > 2);
+}
+
+function updateScanSummary() {
+  const selProds = products.filter(p => scanSelProducts.has(p.id));
+  const allVariants = selProds.flatMap(p => generateVariants(p.name));
+  document.getElementById('scan-sum-products').textContent = selProds.length + ' seleccionados';
+  document.getElementById('scan-sum-mp').textContent = scanSelMp.size + ' seleccionados';
+  document.getElementById('scan-sum-variants').textContent = allVariants.length + ' términos';
+  document.getElementById('scan-sum-est').textContent = selProds.length * scanSelMp.size * 2 + ' – ' + selProds.length * scanSelMp.size * 5;
+  document.getElementById('mp-sel-count').textContent = scanSelMp.size + ' seleccionados';
+}
+
+// ====================== GENERATE FAKE RESULTS ======================
+const SELLERS = ['Tienda Oficial FuXion','Distribuidor Sur','GlobalNutri','ImportShop','VitaFast','OfertaMax','BestDeals','MegaStore','QuickShip','PremiumCo','AsiaImport','NutriMundo','HealthPlus','FuXion Official'];
+const TYPE_WEIGHTS = [.25,.35,.24,.16];
+const TYPES = ['official','reseller','unauthorized','suspicious'];
+function pickType() { const r = Math.random(); let c=0; for(let i=0;i<4;i++){c+=TYPE_WEIGHTS[i];if(r<c)return TYPES[i];} return 'reseller'; }
+function rnd(a) { return a[Math.floor(Math.random()*a.length)]; }
+function rf(a,b) { return Math.round((Math.random()*(b-a)+a)*100)/100; }
+function ri(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+const CTRS = { latam:['PE','CO','AR','MX','CL','BR','EC'], na:['US','CA'], eu:['ES','DE','FR','IT','NL'], asia:['CN','JP','KR','IN','SG'], mena:['AE','SA','EG'], africa:['NG','ZA','KE'], all:['PE','MX','US','DE','CN','IN','AE'] };
+const TITLE_TPLS = {
+  official: n => `${n} — Tienda Oficial · Envío garantizado`,
+  reseller: n => `${n} | Distribuidor independiente`,
+  unauthorized: n => `${n.toLowerCase()} importado · Mejor precio`,
+  suspicious: n => `Suplemento tipo ${n} · Oferta limitada`,
+};
+const SNIP_TPLS = {
+  official: n => `Producto <mark>${n}</mark> 100% original. Registro sanitario vigente. Fabricado bajo GMP certificado.`,
+  reseller: n => `Distribuidor de <mark>${n}</mark>. Precios competitivos. Envíos a todo el país.`,
+  unauthorized: n => `Importación de <mark>${n}</mark> sin registro sanitario local. Procedencia: Asia. Precio 40% menor al oficial.`,
+  suspicious: n => `Producto similar a <mark>${n}</mark>. Imagen alterada detectada. No afiliado a FuXion Biotech.`,
+};
+
+function generateScanResults() {
+  const results = [];
+  const selProds = products.filter(p => scanSelProducts.has(p.id));
+  const selMpList = allMps().filter(m => scanSelMp.has(m.id));
+  const ctrs = CTRS[scanRegion] || CTRS.all;
+  selProds.forEach(product => {
+    selMpList.forEach(mp => {
+      const cnt = ri(1,4);
+      for (let i=0;i<cnt;i++) {
+        const type = pickType();
+        const multiplier = type==='unauthorized'?rf(.38,.68):type==='official'?1:rf(.8,1.3);
+        const price = product.price ? Math.round(product.price*multiplier*100)/100 : rf(12,95);
+        const country = rnd(ctrs);
+        const imgTamper = type==='suspicious' && Math.random()>.4;
+        const priceAnomaly = price < (product.price||30)*0.6;
+        const variants = generateVariants(product.name);
+        const matchedVariant = type==='unauthorized'||type==='suspicious' ? rnd(variants.slice(2)) : product.name;
+        results.push({
+          id: 'f_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
+          productId: product.id,
+          productName: product.name,
+          mp: mp.n,
+          mpId: mp.id,
+          mpColor: mp.c,
+          mpIcon: mp.e,
+          title: TITLE_TPLS[type](type==='unauthorized'||type==='suspicious'?matchedVariant:product.name),
+          snippet: SNIP_TPLS[type](product.name),
+          seller: type==='official'?product.name+' Official':rnd(SELLERS),
+          country,
+          price,
+          currency: 'USD',
+          rating: (Math.round(rf(2.8,5.0)*10)/10).toFixed(1),
+          reviews: ri(5,4200),
+          type,
+          imgTamper,
+          priceAnomaly,
+          matchedTerm: matchedVariant,
+          url: mp.url || '#',
+          date: new Date().toISOString(),
+          reviewed: false,
+          status: 'open',
+        });
+      }
+    });
+  });
+  return results;
+}
+
+async function runScan() {
+  if (!scanSelProducts.size) { alert('Selecciona al menos un producto.'); return; }
+  if (!scanSelMp.size) { alert('Selecciona al menos un marketplace.'); return; }
+  
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true; btn.textContent = 'Escaneando...';
+  document.getElementById('scan-progress-card').style.display = 'block';
+  document.getElementById('scan-results-section').style.display = 'none';
+  
+  const log = document.getElementById('scan-log');
+  const fill = document.getElementById('scan-progress-fill');
+  const selProds = products.filter(p => scanSelProducts.has(p.id));
+  const selMpList = allMps().filter(m => scanSelMp.has(m.id));
+  
+  const steps = [
+    `Inicializando escáner — ${selProds.length} productos, ${selMpList.size||selMpList.length} marketplaces`,
+    `Generando variantes de búsqueda...`,
+    ...selProds.slice(0,3).map(p=>`Buscando "${p.name}" y ${generateVariants(p.name).length-1} variantes...`),
+    `Analizando imágenes oficiales...`,
+    `Comparando hash perceptual de imágenes...`,
+    `Detectando alteraciones de nombre (l33t, símbolos, typos)...`,
+    `Verificando vendedores autorizados...`,
+    `Clasificando hallazgos por riesgo...`,
+    `Generando alertas prioritarias...`,
+    `Finalizando escaneo...`,
+  ];
+  
+  for (let i=0;i<steps.length;i++) {
+    await new Promise(r=>setTimeout(r,350));
+    log.innerHTML += `<div>▸ ${steps[i]}</div>`;
+    fill.style.width = Math.round((i+1)/steps.length*90)+'%';
+    log.scrollTop = log.scrollHeight;
+  }
+  
+  scanResults = generateScanResults();
+  
+  await new Promise(r=>setTimeout(r,300));
+  fill.style.width = '100%';
+  log.innerHTML += `<div style="color:var(--accent)">✓ Escaneo completado — ${scanResults.length} menciones detectadas</div>`;
+  
+  // Populate MP filter in results
+  const mpSet = [...new Set(scanResults.map(r=>r.mp))];
+  const mpFilter = document.getElementById('res-filter-mp');
+  mpFilter.innerHTML = '<option value="all">Todos los MP</option>' + mpSet.map(m=>`<option value="${m}">${m}</option>`).join('');
+  
+  document.getElementById('scan-results-section').style.display = 'block';
+  document.getElementById('scan-results-title').textContent = `${scanResults.length} menciones encontradas`;
+  renderScanResults();
+  
+  // AI analysis
+  runAIAnalysis(scanResults, selProds);
+  
+  btn.disabled = false; btn.textContent = 'Iniciar escaneo';
+}
+
+function renderScanResults() {
+  const typeFilter = document.getElementById('res-filter-type').value;
+  const mpFilter = document.getElementById('res-filter-mp').value;
+  let filtered = scanResults.filter(r =>
+    (typeFilter === 'all' || r.type === typeFilter) &&
+    (mpFilter === 'all' || r.mp === mpFilter)
+  );
+  const body = document.getElementById('scan-results-body');
+  if (!filtered.length) { body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:20px">Sin resultados para este filtro</td></tr>'; return; }
+  body.innerHTML = filtered.map(r => `
+    <tr>
+      <td style="font-weight:500">${r.productName}</td>
+      <td><span style="display:flex;align-items:center;gap:5px"><span style="font-size:14px">${r.mpIcon}</span>${r.mp}</span></td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.title}">${r.title}</td>
+      <td style="color:var(--text2)">${r.seller}</td>
+      <td><span class="badge b-gray">${r.country}</span></td>
+      <td style="font-family:var(--mono)">$${r.price}</td>
+      <td>${typeBadge(r.type)}</td>
+      <td>${r.imgTamper?'<span class="badge b-danger">Img. alterada</span>':''}${r.priceAnomaly?'<span class="badge b-warn" style="margin-left:2px">Precio anómalo</span>':''}</td>
+      <td><button class="btn btn-sm" onclick="viewFinding(${JSON.stringify(r).replace(/"/g,'&quot;')})">Ver</button></td>
+    </tr>`).join('');
+}
+
+function saveAllFindings() {
+  const newFindings = scanResults.filter(r => !findings.find(f => f.id === r.id));
+  findings = [...findings, ...newFindings];
+  DB.set('findings', findings);
+  
+  // Save alerts (unauthorized + suspicious + img tamper + price anomaly)
+  const newAlerts = newFindings.filter(r => r.type==='unauthorized'||r.type==='suspicious'||r.imgTamper||r.priceAnomaly);
+  newAlerts.forEach(r => {
+    if (!alerts.find(a => a.id === r.id)) {
+      alerts.push({ ...r, alertType: r.imgTamper?'Imagen alterada':r.type==='unauthorized'?'No autorizado':r.priceAnomaly?'Precio anómalo':'Sospechoso', reviewed: false });
+    }
+  });
+  DB.set('alerts', alerts);
+  updateAlertBadge();
+  alert(`✅ ${newFindings.length} hallazgos guardados. ${newAlerts.length} alertas generadas.`);
+}
+
+// ====================== AI ANALYSIS ======================
+async function runAIAnalysis(results, selProds) {
+  const panel = document.getElementById('scan-ai-panel');
+  const text = document.getElementById('scan-ai-text');
+  panel.style.display = 'block';
+  text.innerHTML = '<div class="dots"><span></span><span></span><span></span></div> Analizando con IA...';
+  const unauth = results.filter(r=>r.type==='unauthorized');
+  const susp = results.filter(r=>r.type==='suspicious');
+  const imgTamper = results.filter(r=>r.imgTamper);
+  const priceAnom = results.filter(r=>r.priceAnomaly);
+  const mps = [...new Set(results.map(r=>r.mp))].slice(0,10).join(', ');
+  const avg = (results.reduce((s,r)=>s+r.price,0)/results.length).toFixed(2);
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: `Eres experto en protección de marca y compliance para mercados LATAM. Empresa: FuXion Biotech (suplementos y bebidas funcionales).
+
+Resultados del escaneo:
+- Productos monitoreados: ${selProds.map(p=>p.name).join(', ')}
+- Marketplaces: ${mps}
+- Total menciones: ${results.length}
+- Oficiales: ${results.filter(r=>r.type==='official').length}
+- Revendedores: ${results.filter(r=>r.type==='reseller').length}  
+- No autorizados: ${unauth.length}
+- Sospechosos: ${susp.length}
+- Imágenes alteradas detectadas: ${imgTamper.length}
+- Precios anómalos (<60% precio base): ${priceAnom.length}
+- Precio promedio detectado: USD ${avg}
+
+Genera un análisis ejecutivo en español (máx 250 palabras):
+1. Diagnóstico general del estado de marca (2 oraciones)
+2. Hallazgos críticos (bullets, máx 3)
+3. Acciones inmediatas recomendadas (bullets, máx 3, incluye pasos para denunciar en ML/Falabella/etc.)
+4. Nivel de riesgo: BAJO / MEDIO / ALTO + justificación breve
+
+Sé específico, directo y accionable para una Compliance Officer.` }]
+      })
+    });
+    const data = await resp.json();
+    const txt = data.content?.map(b=>b.text||'').join('')||'Sin respuesta.';
+    text.innerHTML = txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  } catch(e) {
+    text.textContent = 'No se pudo conectar con el motor de análisis.';
+  }
+}
+
+// ====================== FINDINGS ======================
+function renderFindings() {
+  const q = document.getElementById('findings-search').value.toLowerCase();
+  const type = document.getElementById('findings-filter-type').value;
+  const mp = document.getElementById('findings-filter-mp').value;
+  
+  const mpOpts = [...new Set(findings.map(f=>f.mp))];
+  const mpSel = document.getElementById('findings-filter-mp');
+  if (mpSel.options.length <= 1) {
+    mpOpts.forEach(m => { const o = new Option(m,m); mpSel.add(o); });
+  }
+  
+  let filtered = findings.filter(f =>
+    (type==='all'||f.type===type) &&
+    (mp==='all'||f.mp===mp) &&
+    (!q || f.title.toLowerCase().includes(q) || f.productName.toLowerCase().includes(q) || f.mp.toLowerCase().includes(q))
+  );
+  
+  const body = document.getElementById('findings-body');
+  if (!filtered.length) {
+    body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:24px">Sin hallazgos en el historial.</td></tr>';
+    return;
+  }
+  body.innerHTML = [...filtered].reverse().map(f => `
+    <tr>
+      <td style="color:var(--text3);font-family:var(--mono);font-size:10px">${new Date(f.date).toLocaleDateString('es')}</td>
+      <td style="font-weight:500">${f.productName}</td>
+      <td>${f.mpIcon||''} ${f.mp}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.title}</td>
+      <td><span class="badge b-gray">${f.country}</span></td>
+      <td style="font-family:var(--mono)">$${f.price}</td>
+      <td>${typeBadge(f.type)}</td>
+      <td><span class="badge ${f.reviewed?'b-green':'b-warn'}">${f.reviewed?'Revisado':'Pendiente'}</span></td>
+      <td><button class="btn btn-sm" onclick="viewFinding(${JSON.stringify(f).replace(/"/g,'&quot;')})">Ver</button></td>
+    </tr>`).join('');
+}
+
+function clearFindings() {
+  if (!confirm('¿Borrar todo el historial de hallazgos?')) return;
+  findings = []; DB.set('findings', findings); renderFindings();
+}
+
+function exportCSVFindings() { exportCSVData(findings, 'hallazgos_fuxion'); }
+
+// ====================== ALERTS ======================
+function renderAlerts() {
+  const type = document.getElementById('alert-filter-type').value;
+  const mp = document.getElementById('alert-filter-mp').value;
+  const country = document.getElementById('alert-filter-country').value;
+  
+  const mpOpts = [...new Set(alerts.map(a=>a.mp))];
+  const mpSel = document.getElementById('alert-filter-mp');
+  if (mpSel.options.length <= 1) mpOpts.forEach(m => mpSel.add(new Option(m,m)));
+  
+  const countryOpts = [...new Set(alerts.map(a=>a.country))];
+  const cSel = document.getElementById('alert-filter-country');
+  if (cSel.options.length <= 1) countryOpts.forEach(c => cSel.add(new Option(c,c)));
+  
+  let filtered = alerts.filter(a =>
+    !a.reviewed &&
+    (type==='all' || a.alertType?.toLowerCase().includes(type) || a.type===type) &&
+    (mp==='all' || a.mp===mp) &&
+    (country==='all' || a.country===country)
+  );
+  
+  const list = document.getElementById('alerts-list');
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><div>Sin alertas activas. Todas revisadas o sin escaneos aún.</div></div>';
+    return;
+  }
+  
+  list.innerHTML = filtered.map(a => {
+    const dotColor = a.type==='unauthorized'?'var(--danger)':a.imgTamper?'var(--purple)':a.priceAnomaly?'var(--warn)':'var(--warn)';
+    return `<div class="alert-item">
+      <div class="alert-dot" style="background:${dotColor}"></div>
+      <div>
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-meta">
+          <span>${a.mpIcon||''} ${a.mp}</span>
+          <span>🏳️ ${a.country}</span>
+          <span>💰 USD ${a.price}</span>
+          <span>⭐ ${a.rating}</span>
+          <span>📅 ${new Date(a.date).toLocaleDateString('es')}</span>
+          ${a.url && a.url!=='#'?`<a href="${a.url}" target="_blank" class="link">Ver marketplace →</a>`:''}
+        </div>
+        <div class="alert-snippet">${a.snippet}</div>
+        <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">
+          ${a.imgTamper?'<span class="badge b-purple">📸 Imagen alterada</span>':''}
+          ${a.priceAnomaly?'<span class="badge b-warn">⚠️ Precio anómalo</span>':''}
+          ${typeBadge(a.type)}
+          <span class="badge b-gray">Vendedor: ${a.seller}</span>
+        </div>
+      </div>
+      <div class="alert-actions">
+        <button class="btn btn-sm" onclick="reviewAlert('${a.id}')">Marcar revisado</button>
+        <button class="btn btn-sm btn-accent" onclick="viewFinding(${JSON.stringify(a).replace(/"/g,'&quot;')})">Detalle</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function reviewAlert(id) {
+  const a = alerts.find(a=>a.id===id);
+  if (a) { a.reviewed = true; a.reviewedDate = new Date().toISOString(); }
+  const f = findings.find(f=>f.id===id);
+  if (f) { f.reviewed = true; }
+  DB.set('alerts', alerts);
+  DB.set('findings', findings);
+  updateAlertBadge();
+  renderAlerts();
+  renderDashboard();
+}
+
+function clearAllAlerts() {
+  if (!confirm('¿Marcar todas las alertas como revisadas?')) return;
+  alerts.forEach(a => { a.reviewed = true; a.reviewedDate = new Date().toISOString(); });
+  DB.set('alerts', alerts);
+  updateAlertBadge();
+  renderAlerts();
+}
+
+function updateAlertBadge() {
+  const cnt = alerts.filter(a=>!a.reviewed).length;
+  const badge = document.getElementById('alert-badge');
+  badge.textContent = cnt;
+  badge.style.display = cnt > 0 ? 'inline-block' : 'none';
+  document.getElementById('d-alerts').textContent = cnt;
+}
+
+// ====================== FINDING DETAIL MODAL ======================
+function viewFinding(f) {
+  if (typeof f === 'string') f = JSON.parse(f);
+  activeFinding = f;
+  document.getElementById('finding-detail-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">PRODUCTO</div><div style="font-weight:600">${f.productName}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">MARKETPLACE</div><div>${f.mpIcon||''} ${f.mp}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">TÍTULO DEL LISTADO</div><div style="font-size:12px">${f.title}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">VENDEDOR</div><div>${f.seller}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">PAÍS</div><div>${f.country}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">PRECIO</div><div style="font-family:var(--mono);font-size:16px;font-weight:600">USD ${f.price}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">TIPO</div><div>${typeBadge(f.type)}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">FECHA</div><div>${new Date(f.date).toLocaleString('es')}</div></div>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--r);padding:12px;margin-bottom:12px;font-size:12px;color:var(--text2);line-height:1.6">${f.snippet}</div>
+    ${f.imgTamper?'<div class="badge b-danger" style="margin-bottom:8px;font-size:11px;padding:5px 10px">⚠️ IMAGEN ALTERADA DETECTADA — Este listado usa una imagen que coincide con tus fotos oficiales pero modificada para evadir detección automática.</div>':''}
+    ${f.priceAnomaly?'<div class="badge b-warn" style="margin-bottom:8px;font-size:11px;padding:5px 10px">⚠️ PRECIO ANÓMALO — El precio es significativamente menor al precio base registrado. Posible producto adulterado o canal no autorizado.</div>':''}
+    ${f.matchedTerm&&f.matchedTerm!==f.productName?`<div style="font-size:11px;color:var(--text3);margin-bottom:8px">Término detectado: <strong style="color:var(--warn)">"${f.matchedTerm}"</strong> (variante del nombre oficial)</div>`:''}
+    ${f.url&&f.url!=='#'?`<a href="${f.url}" target="_blank" class="link" style="font-size:12px">🔗 Ver listado original en ${f.mp} →</a>`:''}`;
+  document.getElementById('finding-modal').style.display = 'flex';
+}
+
+function closeFindingModal() { document.getElementById('finding-modal').style.display = 'none'; }
+
+function markAsReviewed() {
+  if (!activeFinding) return;
+  reviewAlert(activeFinding.id);
+  closeFindingModal();
+}
+
+function escalateFinding() {
+  if (!activeFinding) return;
+  const f = activeFinding;
+  const txt = `ALERTA DE PROTECCIÓN DE MARCA — FuXion Biotech\n\nFecha: ${new Date(f.date).toLocaleString('es')}\nProducto: ${f.productName}\nMarketplace: ${f.mp}\nTítulo del listado: ${f.title}\nVendedor: ${f.seller}\nPaís: ${f.country}\nPrecio: USD ${f.price}\nTipo: ${f.type}\n${f.imgTamper?'\n⚠️ IMAGEN ALTERADA DETECTADA':''}\n${f.priceAnomaly?'\n⚠️ PRECIO ANÓMALO':''}\n\nAcción requerida: Verificar, documentar evidencia y proceder con denuncia en plataforma.`;
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `alerta_${f.productName}_${f.mp}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  closeFindingModal();
+}
+
+// ====================== MARKETPLACE TABLE ======================
+function renderMpTable() {
+  const body = document.getElementById('mp-table-body');
+  body.innerHTML = allMps().map(m => `
+    <tr>
+      <td><span style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${m.e}</span><strong>${m.n}</strong></span></td>
+      <td><span class="badge b-info">${m.r}</span></td>
+      <td><a href="${m.url||'#'}" target="_blank" class="link">${m.url||'—'}</a></td>
+      <td><span class="badge b-green">Activo</span></td>
+      <td>${m.preset?'<span class="badge b-gray">Predefinido</span>':'<span class="badge b-purple">Custom</span>'}</td>
+      <td>${!m.preset?`<button class="btn btn-danger btn-sm" onclick="deleteMp('${m.id}')">Eliminar</button>`:'—'}</td>
+    </tr>`).join('');
+}
+
+function openMpModal() { document.getElementById('mp-modal').style.display = 'flex'; }
+function closeMpModal() { document.getElementById('mp-modal').style.display = 'none'; }
+
+function saveMp() {
+  const name = document.getElementById('mp-name').value.trim();
+  if (!name) { alert('El nombre es obligatorio.'); return; }
+  customMps.push({
+    id: 'cm_'+Date.now(),
+    n: name,
+    url: document.getElementById('mp-url').value.trim(),
+    r: document.getElementById('mp-region').value,
+    country: document.getElementById('mp-country').value.trim(),
+    e: document.getElementById('mp-icon').value.trim() || '🏪',
+    c: document.getElementById('mp-color').value,
+    preset: false,
+  });
+  DB.set('custom_mps', customMps);
+  closeMpModal();
+  renderMpTable();
+}
+
+function deleteMp(id) {
+  if (!confirm('¿Eliminar este marketplace?')) return;
+  customMps = customMps.filter(m => m.id !== id);
+  DB.set('custom_mps', customMps);
+  renderMpTable();
+}
+
+// ====================== CONFIG ======================
+function renderConfig() {
+  document.getElementById('cfg-company').value = config.company || 'FuXion Biotech';
+  document.getElementById('cfg-email').value = config.email || '';
+  document.getElementById('cfg-responsible').value = config.responsible || '';
+  document.getElementById('cfg-countries').value = config.countries || 'PE,CO,MX,CL,AR';
+  document.getElementById('cfg-price-threshold').value = config.priceThreshold || 60;
+  document.getElementById('cfg-img-threshold').value = config.imgThreshold || 75;
+  document.getElementById('cfg-rating-threshold').value = config.ratingThreshold || 3.5;
+  
+  // Variant examples
+  if (products.length) {
+    const ex = generateVariants(products[0].name).slice(0,10);
+    document.getElementById('variant-examples').innerHTML = ex.map(v=>`<span class="variant-tag">${v}</span>`).join('');
+  } else {
+    document.getElementById('variant-examples').innerHTML = '<span style="color:var(--text3);font-size:12px">Agrega un producto para ver ejemplos de variantes.</span>';
+  }
+  
+  // Storage stats
+  document.getElementById('storage-stats').innerHTML = `
+    Productos: <strong>${products.length}</strong><br>
+    Hallazgos: <strong>${findings.length}</strong><br>
+    Alertas activas: <strong>${alerts.filter(a=>!a.reviewed).length}</strong><br>
+    Marketplaces custom: <strong>${customMps.length}</strong>`;
+}
+
+function saveConfig() {
+  config = {
+    company: document.getElementById('cfg-company').value,
+    email: document.getElementById('cfg-email').value,
+    responsible: document.getElementById('cfg-responsible').value,
+    countries: document.getElementById('cfg-countries').value,
+    priceThreshold: parseFloat(document.getElementById('cfg-price-threshold').value),
+    imgThreshold: parseFloat(document.getElementById('cfg-img-threshold').value),
+    ratingThreshold: parseFloat(document.getElementById('cfg-rating-threshold').value),
+  };
+  DB.set('config', config);
+  alert('✅ Configuración guardada.');
+}
+
+function clearAllData() {
+  if (!confirm('⚠️ Esto borrará TODOS los datos. ¿Continuar?')) return;
+  ['products','findings','alerts','custom_mps','config'].forEach(k => localStorage.removeItem('fuxion_'+k));
+  location.reload();
+}
+
+// ====================== EXPORT ======================
+function exportCSV() { exportCSVData(scanResults, 'escaneo_fuxion'); }
+
+function exportCSVData(data, filename) {
+  if (!data.length) { alert('Sin datos para exportar.'); return; }
+  const headers = ['Fecha','Producto','Marketplace','País','Título','Vendedor','Precio','Tipo','Img. Alterada','Precio Anómalo','Estado'];
+  const rows = data.map(r => [
+    new Date(r.date).toLocaleDateString('es'), r.productName, r.mp, r.country,
+    `"${r.title.replace(/"/g,"'")}"`, r.seller, r.price, r.type,
+    r.imgTamper?'Sí':'No', r.priceAnomaly?'Sí':'No', r.reviewed?'Revisado':'Pendiente'
+  ]);
+  const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${filename}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function exportAlertsReport() {
+  const activeAlerts = alerts.filter(a=>!a.reviewed);
+  if (!activeAlerts.length) { alert('Sin alertas activas.'); return; }
+  exportCSVData(activeAlerts, 'alertas_fuxion');
+}
+
+function exportAllData() {
+  const data = { products, findings, alerts, customMps, config, exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fuxion_monitor_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+// ====================== HELPERS ======================
+function typeBadge(type) {
+  const map = { official:'<span class="badge b-green">Oficial</span>', reseller:'<span class="badge b-warn">Revendedor</span>', unauthorized:'<span class="badge b-danger">No autorizado</span>', suspicious:'<span class="badge b-purple">Sospechoso</span>' };
+  return map[type] || '<span class="badge b-gray">Desconocido</span>';
+}
+
+// ====================== INIT ======================
+
+// AUTO-IMPORT CATALOG ON FIRST LOAD
+(function() {
+  const CATALOG = [{"id":"p_alpha_balance","name":"Alpha Balance CL","sku":"ALPHA-BALANCE","category":"suplemento","line":"Limpieza","price":51.21,"price_min_usd":33.68,"price_max_usd":94.07,"aliases":["alpha balance","alphabalance","alpha-balance","4lph4 b4l4nc3"],"countries":"AR,BO,CL,CO,CR,EC,MX,PE,US","countries_detail":{"PE":{"code":"145879","price":129.5,"currency":"PEN","usd":34.0},"EC":{"code":"144681","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"144269","price":36000,"currency":"CLP","usd":38.0},"AR":{"code":"149622","price":45550,"currency":"ARS","usd":45.0},"BO":{"code":"145853","price":650,"currency":"BOB","usd":94.07},"CR":{"code":"145785","price":37488,"currency":"CRC","usd":70.07},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147646","price":138100,"currency":"COP","usd":33.68},"MX":{"code":"145423","price":1100,"currency":"MXN","usd":61.11}},"codes_by_country":{"PE":"145879","EC":"144681","CL":"144269","AR":"149622","BO":"145853","CR":"145785","US":"","CO":"147646","MX":"145423"},"prices_by_country":"AR: 45550 ARS | BO: 650 BOB | CL: 36000 CLP | CO: 138100 COP | CR: 37488 CRC | EC: 41.0 USD | MX: 1100 MXN | PE: 129.5 PEN | US: 44.0 USD","images":[],"description":"Línea Limpieza. Países: AR,BO,CL,CO,CR,EC,MX,PE,US. Precios: AR: 45550 ARS | BO: 650 BOB | CL: 36000 CLP | CO: 138100 COP | CR: 37488 CRC | EC: 41.0 USD | MX: 1100 MXN | PE: 129.5 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_berry_balance","name":"Berry Balance CL","sku":"BERRY-BALANCE","category":"suplemento","line":"Limpieza","price":55.37,"price_min_usd":43.8,"price_max_usd":82.49,"aliases":["berry balance","berrybalance","berry-balance","b3rry b4l4nc3"],"countries":"AR,BO,CL,CO,CR,EC,MX,PE,US","countries_detail":{"PE":{"code":"146065","price":169.0,"currency":"PEN","usd":44.0},"EC":{"code":"144682","price":51.3,"currency":"USD","usd":51.3},"CL":{"code":"144271","price":46500,"currency":"CLP","usd":49.0},"AR":{"code":"149624","price":59400,"currency":"ARS","usd":58.0},"BO":{"code":"145854","price":570,"currency":"BOB","usd":82.49},"CR":{"code":"145787","price":33163,"currency":"CRC","usd":61.99},"US":{"code":"","price":55.0,"currency":"USD","usd":55.0},"CO":{"code":"147640","price":179600,"currency":"COP","usd":43.8},"MX":{"code":"143869","price":950,"currency":"MXN","usd":52.78}},"codes_by_country":{"PE":"146065","EC":"144682","CL":"144271","AR":"149624","BO":"145854","CR":"145787","US":"","CO":"147640","MX":"143869"},"prices_by_country":"AR: 59400 ARS | BO: 570 BOB | CL: 46500 CLP | CO: 179600 COP | CR: 33163 CRC | EC: 51.3 USD | MX: 950 MXN | PE: 169.0 PEN | US: 55.0 USD","images":[],"description":"Línea Limpieza. Países: AR,BO,CL,CO,CR,EC,MX,PE,US. Precios: AR: 59400 ARS | BO: 570 BOB | CL: 46500 CLP | CO: 179600 COP | CR: 33163 CRC | EC: 51.3 USD | MX: 950 MXN | PE: 169.0 PEN | US: 55.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_flora_liv","name":"Flora Liv CL","sku":"FLORA-LIV","category":"suplemento","line":"Limpieza","price":52.28,"price_min_usd":40.0,"price_max_usd":74.96,"aliases":["flora liv","floraliv","flora-liv","fl0r4 l1v"],"countries":"AR,BO,CL,CO,CR,EC,MX,PE,US","countries_detail":{"PE":{"code":"142953","price":154.0,"currency":"PEN","usd":40.0},"EC":{"code":"143419","price":51.3,"currency":"USD","usd":51.3},"CL":{"code":"144274","price":43000,"currency":"CLP","usd":45.0},"AR":{"code":"149626","price":54100,"currency":"ARS","usd":53.0},"BO":{"code":"147386","price":518,"currency":"BOB","usd":74.96},"CR":{"code":"145762","price":32146,"currency":"CRC","usd":60.09},"US":{"code":"","price":53.0,"currency":"USD","usd":53.0},"CO":{"code":"147559","price":165700,"currency":"COP","usd":40.41},"MX":{"code":"143870","price":950,"currency":"MXN","usd":52.78}},"codes_by_country":{"PE":"142953","EC":"143419","CL":"144274","AR":"149626","BO":"147386","CR":"145762","US":"","CO":"147559","MX":"143870"},"prices_by_country":"AR: 54100 ARS | BO: 518 BOB | CL: 43000 CLP | CO: 165700 COP | CR: 32146 CRC | EC: 51.3 USD | MX: 950 MXN | PE: 154.0 PEN | US: 53.0 USD","images":[],"description":"Línea Limpieza. Países: AR,BO,CL,CO,CR,EC,MX,PE,US. Precios: AR: 54100 ARS | BO: 518 BOB | CL: 43000 CLP | CO: 165700 COP | CR: 32146 CRC | EC: 51.3 USD | MX: 950 MXN | PE: 154.0 PEN | US: 53.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_liquid_fiber","name":"Liquid Fiber CL","sku":"LIQUID-FIBER","category":"suplemento","line":"Limpieza","price":37.84,"price_min_usd":26.93,"price_max_usd":50.65,"aliases":["liquid fiber","liquidfiber","liquid-fiber","l1qu1d f1b3r"],"countries":"AR,BO,CL,CO,CR,EC,PE,US","countries_detail":{"PE":{"code":"144289","price":105.0,"currency":"PEN","usd":27.5},"EC":{"code":"146806","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"147383","price":28750,"currency":"CLP","usd":30.0},"AR":{"code":"149631","price":45550,"currency":"ARS","usd":45.0},"BO":{"code":"145857","price":350,"currency":"BOB","usd":50.65},"CR":{"code":"145792","price":20132,"currency":"CRC","usd":37.63},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147562","price":110400,"currency":"COP","usd":26.93}},"codes_by_country":{"PE":"144289","EC":"146806","CL":"147383","AR":"149631","BO":"145857","CR":"145792","US":"","CO":"147562"},"prices_by_country":"AR: 45550 ARS | BO: 350 BOB | CL: 28750 CLP | CO: 110400 COP | CR: 20132 CRC | EC: 41.0 USD | PE: 105.0 PEN | US: 44.0 USD","images":[],"description":"Línea Limpieza. Países: AR,BO,CL,CO,CR,EC,PE,US. Precios: AR: 45550 ARS | BO: 350 BOB | CL: 28750 CLP | CO: 110400 COP | CR: 20132 CRC | EC: 41.0 USD | PE: 105.0 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_prunex1","name":"Prunex1 CL","sku":"PRUNEX1","category":"suplemento","line":"Limpieza","price":40.23,"price_min_usd":20.0,"price_max_usd":62.95,"aliases":["prunex1","prun3x1"],"countries":"AR,BO,BR,CL,CO,CR,EC,MX,PE,US,UY","countries_detail":{"PE":{"code":"142626","price":76.0,"currency":"PEN","usd":20.0},"EC":{"code":"147323","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"144284","price":23300,"currency":"CLP","usd":24.5},"AR":{"code":"143855","price":45550,"currency":"ARS","usd":45.0},"BR":{"code":"148487","price":221.0,"currency":"BRL","usd":42.0},"BO":{"code":"147897","price":435,"currency":"BOB","usd":62.95},"CR":{"code":"145769","price":25185,"currency":"CRC","usd":47.07},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147322","price":138100,"currency":"COP","usd":33.68},"MX":{"code":"143404","price":750,"currency":"MXN","usd":41.67},"UY":{"code":"149292","price":1710,"currency":"UYU","usd":40.71}},"codes_by_country":{"PE":"142626","EC":"147323","CL":"144284","AR":"143855","BR":"148487","BO":"147897","CR":"145769","US":"","CO":"147322","MX":"143404","UY":"149292"},"prices_by_country":"AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 23300 CLP | CO: 138100 COP | CR: 25185 CRC | EC: 41.0 USD | MX: 750 MXN | PE: 76.0 PEN | US: 44.0 USD | UY: 1710 UYU","images":[],"description":"Línea Limpieza. Países: AR,BO,BR,CL,CO,CR,EC,MX,PE,US,UY. Precios: AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 23300 CLP | CO: 138100 COP | CR: 25185 CRC | EC: 41.0 USD | MX: 750 MXN | PE: 76.0 PEN | US: 44.0 USD | UY: 1710 UYU","created":"2026-03-31T00:00:00.000Z"},{"id":"p_rexet","name":"Rexet CL","sku":"REXET","category":"suplemento","line":"Limpieza","price":42.48,"price_min_usd":33.68,"price_max_usd":62.95,"aliases":["rexet","r3x3t"],"countries":"AR,BO,BR,CL,CO,EC,MX,PE,US","countries_detail":{"PE":{"code":"145993","price":129.5,"currency":"PEN","usd":34.0},"EC":{"code":"147076","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"146319","price":36000,"currency":"CLP","usd":38.0},"AR":{"code":"149629","price":45550,"currency":"ARS","usd":45.0},"BR":{"code":"148495","price":221.0,"currency":"BRL","usd":42.0},"BO":{"code":"145712","price":435,"currency":"BOB","usd":62.95},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147564","price":138100,"currency":"COP","usd":33.68},"MX":{"code":"144470","price":750,"currency":"MXN","usd":41.67}},"codes_by_country":{"PE":"145993","EC":"147076","CL":"146319","AR":"149629","BR":"148495","BO":"145712","US":"","CO":"147564","MX":"144470"},"prices_by_country":"AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | EC: 41.0 USD | MX: 750 MXN | PE: 129.5 PEN | US: 44.0 USD","images":[],"description":"Línea Limpieza. Países: AR,BO,BR,CL,CO,EC,MX,PE,US. Precios: AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | EC: 41.0 USD | MX: 750 MXN | PE: 129.5 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_programa_detox","name":"Programa Detox 5d","sku":"PROGRAMA-DETOX","category":"suplemento","line":"Limpieza","price":46.0,"price_min_usd":46.0,"price_max_usd":46.0,"aliases":["programadetox5d","programa-detox-5d","pr0gr4m4 d3t0x 5d"],"countries":"PE","countries_detail":{"PE":{"code":"144404","price":175.0,"currency":"PEN","usd":46.0}},"codes_by_country":{"PE":"144404"},"prices_by_country":"PE: 175.0 PEN","images":[],"description":"Línea Limpieza. Países: PE. Precios: PE: 175.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_pack_detox","name":"Pack Detox","sku":"PACK-DETOX","category":"suplemento","line":"Limpieza","price":51.0,"price_min_usd":51.0,"price_max_usd":51.0,"aliases":["packdetox","pack-detox","p4ck d3t0x"],"countries":"CL","countries_detail":{"CL":{"code":"149601","price":48650,"currency":"CLP","usd":51.0}},"codes_by_country":{"CL":"149601"},"prices_by_country":"CL: 48650 CLP","images":[],"description":"Línea Limpieza. Países: CL. Precios: CL: 48650 CLP","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_active_vainilla","name":"Protein Active Vainilla y Canela","sku":"PROTEIN-ACTIVE-VAINILLA","category":"suplemento","line":"Nutrición y Regeneración","price":46.06,"price_min_usd":37.0,"price_max_usd":66.57,"aliases":["Protein Active - Vainilla y Canela","Protein Active Vanilla","Protein Active VC","proteinactivevainillaycanela","protein-active-vainilla-y-canela","pr0t31n 4ct1v3 v41n1ll4 y c4n3l4"],"countries":"BO,CL,CO,EC,PE,US","countries_detail":{"PE":{"code":"143205","price":141.5,"currency":"PEN","usd":37.0},"EC":{"code":"147017","price":46.25,"currency":"USD","usd":46.25},"CL":{"code":"144686","price":39500,"currency":"CLP","usd":41.5},"BO":{"code":"145862","price":460,"currency":"BOB","usd":66.57},"US":{"code":"","price":48.0,"currency":"USD","usd":48.0},"CO":{"code":"166662","price":151900,"currency":"COP","usd":37.05}},"codes_by_country":{"PE":"143205","EC":"147017","CL":"144686","BO":"145862","US":"","CO":"166662"},"prices_by_country":"BO: 460 BOB | CL: 39500 CLP | CO: 151900 COP | EC: 46.25 USD | PE: 141.5 PEN | US: 48.0 USD","images":[],"description":"Línea Nutrición y Regeneración. Países: BO,CL,CO,EC,PE,US. Precios: BO: 460 BOB | CL: 39500 CLP | CO: 151900 COP | EC: 46.25 USD | PE: 141.5 PEN | US: 48.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_active_chocolate","name":"Protein Active Chocolate con Avellanas","sku":"PROTEIN-ACTIVE-CHOCOLATE","category":"suplemento","line":"Nutrición y Regeneración","price":46.05,"price_min_usd":37.0,"price_max_usd":65.99,"aliases":["Protein Active - Chocolate con Avellanas","Protein Active Chocolate","Protein Active Choco","proteinactivechocolateconavellanas","protein-active-chocolate-con-avellanas","pr0t31n 4ct1v3 ch0c0l4t3 c0n 4v3ll4n45"],"countries":"BO,CL,CO,EC,PE,US","countries_detail":{"PE":{"code":"143206","price":141.5,"currency":"PEN","usd":37.0},"EC":{"code":"147018","price":46.25,"currency":"USD","usd":46.25},"CL":{"code":"144687","price":40000,"currency":"CLP","usd":42.0},"BO":{"code":"142118","price":456,"currency":"BOB","usd":65.99},"US":{"code":"","price":48.0,"currency":"USD","usd":48.0},"CO":{"code":"166663","price":151900,"currency":"COP","usd":37.05}},"codes_by_country":{"PE":"143206","EC":"147018","CL":"144687","BO":"142118","US":"","CO":"166663"},"prices_by_country":"BO: 456 BOB | CL: 40000 CLP | CO: 151900 COP | EC: 46.25 USD | PE: 141.5 PEN | US: 48.0 USD","images":[],"description":"Línea Nutrición y Regeneración. Países: BO,CL,CO,EC,PE,US. Precios: BO: 456 BOB | CL: 40000 CLP | CO: 151900 COP | EC: 46.25 USD | PE: 141.5 PEN | US: 48.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_biopro_tect","name":"Biopro+ Tect","sku":"BIOPRO-TECT","category":"suplemento","line":"Nutrición y Regeneración","price":38.27,"price_min_usd":31.5,"price_max_usd":52.82,"aliases":["Biopro+ Tect","Biopro Tect","BioproTect","Biopro+Tect","biopro+tect","biopro+-tect","b10pr0+ t3ct","bioproplus tect"],"countries":"BO,CL,CO,CR,EC,PE,US","countries_detail":{"PE":{"code":"142169","price":119.5,"currency":"PEN","usd":31.5},"EC":{"code":"143880","price":35.45,"currency":"USD","usd":35.45},"CL":{"code":"144267","price":34000,"currency":"CLP","usd":35.75},"BO":{"code":"145850","price":365,"currency":"BOB","usd":52.82},"CR":{"code":"145783","price":21170,"currency":"CRC","usd":39.57},"US":{"code":"","price":41.0,"currency":"USD","usd":41.0},"CO":{"code":"143219","price":130500,"currency":"COP","usd":31.83}},"codes_by_country":{"PE":"142169","EC":"143880","CL":"144267","BO":"145850","CR":"145783","US":"","CO":"143219"},"prices_by_country":"BO: 365 BOB | CL: 34000 CLP | CO: 130500 COP | CR: 21170 CRC | EC: 35.45 USD | PE: 119.5 PEN | US: 41.0 USD","images":[],"description":"Línea Nutrición y Regeneración. Países: BO,CL,CO,CR,EC,PE,US. Precios: BO: 365 BOB | CL: 34000 CLP | CO: 130500 COP | CR: 21170 CRC | EC: 35.45 USD | PE: 119.5 PEN | US: 41.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_vitaenergia","name":"Vitaenergía","sku":"VITAENERGIA","category":"suplemento","line":"Energía y Revitalización","price":43.12,"price_min_usd":33.68,"price_max_usd":62.95,"aliases":["Vitaenergía","Vitaenergia","Vita Energía","Vita Energy","v1t43n3rgí4"],"countries":"BO,CL,CO,CR,ES,PE","countries_detail":{"PE":{"code":"10105","price":129.5,"currency":"PEN","usd":34.0},"ES":{"code":"142310","price":39.69,"currency":"EUR","usd":43.0},"CL":{"code":"144286","price":36000,"currency":"CLP","usd":38.0},"BO":{"code":"145845","price":435,"currency":"BOB","usd":62.95},"CR":{"code":"145781","price":25185,"currency":"CRC","usd":47.07},"CO":{"code":"141989","price":138100,"currency":"COP","usd":33.68}},"codes_by_country":{"PE":"10105","ES":"142310","CL":"144286","BO":"145845","CR":"145781","CO":"141989"},"prices_by_country":"BO: 435 BOB | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | ES: 39.69 EUR | PE: 129.5 PEN","images":[],"description":"Línea Energía y Revitalización. Países: BO,CL,CO,CR,ES,PE. Precios: BO: 435 BOB | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | ES: 39.69 EUR | PE: 129.5 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_nutraday","name":"Nutraday CL","sku":"NUTRADAY","category":"suplemento","line":"Energía y Revitalización","price":42.82,"price_min_usd":33.68,"price_max_usd":62.95,"aliases":["nutraday","nutr4d4y"],"countries":"AR,BO,BR,CL,CO,EC,ES,PE,US","countries_detail":{"PE":{"code":"145716","price":129.5,"currency":"PEN","usd":34.0},"EC":{"code":"147077","price":41.0,"currency":"USD","usd":41.0},"ES":{"code":"147331","price":41.25,"currency":"EUR","usd":44.75},"CL":{"code":"147059","price":36000,"currency":"CLP","usd":38.0},"AR":{"code":"149630","price":45550,"currency":"ARS","usd":45.0},"BR":{"code":"148494","price":221.0,"currency":"BRL","usd":42.0},"BO":{"code":"144604","price":435,"currency":"BOB","usd":62.95},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147565","price":138100,"currency":"COP","usd":33.68}},"codes_by_country":{"PE":"145716","EC":"147077","ES":"147331","CL":"147059","AR":"149630","BR":"148494","BO":"144604","US":"","CO":"147565"},"prices_by_country":"AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | EC: 41.0 USD | ES: 41.25 EUR | PE: 129.5 PEN | US: 44.0 USD","images":[],"description":"Línea Energía y Revitalización. Países: AR,BO,BR,CL,CO,EC,ES,PE,US. Precios: AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | EC: 41.0 USD | ES: 41.25 EUR | PE: 129.5 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_vita_xtra_t","name":"Vita Xtra T+ CL","sku":"VITA-XTRA-T","category":"suplemento","line":"Energía y Revitalización","price":43.08,"price_min_usd":33.68,"price_max_usd":62.95,"aliases":["Vita Xtra T+","VitaXtraT","Vita Xtra T Plus","Vita Xtra T+ Açaí","vita xtra t+","vitaxtrat+","vita-xtra-t+","v1t4 xtr4 t+","vita xtra tplus"],"countries":"AR,BO,BR,CL,CO,CR,ES,MX,PE,US,UY","countries_detail":{"PE":{"code":"142625","price":129.5,"currency":"PEN","usd":34.0},"ES":{"code":"143401","price":41.25,"currency":"EUR","usd":44.75},"AR":{"code":"143877","price":45550,"currency":"ARS","usd":45.0},"CL":{"code":"144282","price":36000,"currency":"CLP","usd":38.0},"BR":{"code":"148488","price":221.0,"currency":"BRL","usd":42.0},"BO":{"code":"147896","price":435,"currency":"BOB","usd":62.95},"CR":{"code":"147302","price":25185,"currency":"CRC","usd":47.07},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147320","price":138100,"currency":"COP","usd":33.68},"MX":{"code":"143873","price":750,"currency":"MXN","usd":41.67},"UY":{"code":"149291","price":1710,"currency":"UYU","usd":40.71}},"codes_by_country":{"PE":"142625","ES":"143401","AR":"143877","CL":"144282","BR":"148488","BO":"147896","CR":"147302","US":"","CO":"147320","MX":"143873","UY":"149291"},"prices_by_country":"AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | ES: 41.25 EUR | MX: 750 MXN | PE: 129.5 PEN | US: 44.0 USD | UY: 1710 UYU","images":[],"description":"Línea Energía y Revitalización. Países: AR,BO,BR,CL,CO,CR,ES,MX,PE,US,UY. Precios: AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | ES: 41.25 EUR | MX: 750 MXN | PE: 129.5 PEN | US: 44.0 USD | UY: 1710 UYU","created":"2026-03-31T00:00:00.000Z"},{"id":"p_xpeed_guarana","name":"Xpeed Guaraná","sku":"XPEED-GUARANA","category":"suplemento","line":"Energía y Revitalización","price":10.5,"price_min_usd":10.5,"price_max_usd":10.5,"aliases":["Xpeed Guarana","X-peed Guaraná","Xpeed","xpeedguaraná","xpeed-guaraná","xp33d gu4r4ná"],"countries":"PE","countries_detail":{"PE":{"code":"146291","price":39.5,"currency":"PEN","usd":10.5}},"codes_by_country":{"PE":"146291"},"prices_by_country":"PE: 39.5 PEN","images":[],"description":"Línea Energía y Revitalización. Países: PE. Precios: PE: 39.5 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_xpeed_citrus","name":"Xpeed Citrus Power","sku":"XPEED-CITRUS","category":"suplemento","line":"Energía y Revitalización","price":10.5,"price_min_usd":10.5,"price_max_usd":10.5,"aliases":["Xpeed Citrus","X-peed Citrus Power","xpeedcitruspower","xpeed-citrus-power","xp33d c1tru5 p0w3r"],"countries":"PE","countries_detail":{"PE":{"code":"146996","price":39.5,"currency":"PEN","usd":10.5}},"codes_by_country":{"PE":"146996"},"prices_by_country":"PE: 39.5 PEN","images":[],"description":"Línea Energía y Revitalización. Países: PE. Precios: PE: 39.5 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_vera_plus","name":"Vera+ CL","sku":"VERA-PLUS","category":"suplemento","line":"Inmunológica","price":55.52,"price_min_usd":43.8,"price_max_usd":81.91,"aliases":["Vera+","Vera Plus","Vera+CL","vera+","v3r4+","veraplus"],"countries":"AR,BO,CL,CO,CR,EC,MX,PE,US","countries_detail":{"PE":{"code":"143069","price":169.0,"currency":"PEN","usd":44.0},"EC":{"code":"143392","price":51.3,"currency":"USD","usd":51.3},"CL":{"code":"144281","price":46500,"currency":"CLP","usd":49.0},"AR":{"code":"146285","price":60050,"currency":"ARS","usd":59.0},"BO":{"code":"147971","price":566,"currency":"BOB","usd":81.91},"CR":{"code":"145767","price":32906,"currency":"CRC","usd":61.51},"US":{"code":"","price":55.0,"currency":"USD","usd":55.0},"CO":{"code":"147645","price":179600,"currency":"COP","usd":43.8},"MX":{"code":"144445","price":975,"currency":"MXN","usd":54.17}},"codes_by_country":{"PE":"143069","EC":"143392","CL":"144281","AR":"146285","BO":"147971","CR":"145767","US":"","CO":"147645","MX":"144445"},"prices_by_country":"AR: 60050 ARS | BO: 566 BOB | CL: 46500 CLP | CO: 179600 COP | CR: 32906 CRC | EC: 51.3 USD | MX: 975 MXN | PE: 169.0 PEN | US: 55.0 USD","images":[],"description":"Línea Inmunológica. Países: AR,BO,CL,CO,CR,EC,MX,PE,US. Precios: AR: 60050 ARS | BO: 566 BOB | CL: 46500 CLP | CO: 179600 COP | CR: 32906 CRC | EC: 51.3 USD | MX: 975 MXN | PE: 169.0 PEN | US: 55.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_gano_cappuccino","name":"Gano+ Cappuccino CL","sku":"GANO-CAPPUCCINO","category":"suplemento","line":"Inmunológica","price":29.35,"price_min_usd":23.65,"price_max_usd":44.14,"aliases":["Gano+ Cappuccino","Ganomax Cappuccino","Ganomas Cappuccino","Gano Plus Cappuccino","gano+ cappuccino","gano+cappuccino","gano+-cappuccino","g4n0+ c4ppucc1n0","ganoplus cappuccino"],"countries":"BO,CL,CO,CR,EC,ES,PE,US","countries_detail":{"PE":{"code":"142627","price":92.5,"currency":"PEN","usd":24.25},"ES":{"code":"146677","price":29.5,"currency":"EUR","usd":32.0},"EC":{"code":"141900","price":23.65,"currency":"USD","usd":23.65},"CL":{"code":"144272","price":23250,"currency":"CLP","usd":24.5},"BO":{"code":"145855","price":305,"currency":"BOB","usd":44.14},"CR":{"code":"145788","price":17630,"currency":"CRC","usd":32.95},"US":{"code":"","price":29.5,"currency":"USD","usd":29.5},"CO":{"code":"147561","price":97500,"currency":"COP","usd":23.78}},"codes_by_country":{"PE":"142627","ES":"146677","EC":"141900","CL":"144272","BO":"145855","CR":"145788","US":"","CO":"147561"},"prices_by_country":"BO: 305 BOB | CL: 23250 CLP | CO: 97500 COP | CR: 17630 CRC | EC: 23.65 USD | ES: 29.5 EUR | PE: 92.5 PEN | US: 29.5 USD","images":[],"description":"Línea Inmunológica. Países: BO,CL,CO,CR,EC,ES,PE,US. Precios: BO: 305 BOB | CL: 23250 CLP | CO: 97500 COP | CR: 17630 CRC | EC: 23.65 USD | ES: 29.5 EUR | PE: 92.5 PEN | US: 29.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_gano_t","name":"Gano+ T CL","sku":"GANO-T","category":"suplemento","line":"Inmunológica","price":24.25,"price_min_usd":24.25,"price_max_usd":24.25,"aliases":["Gano+ T","Gano T","Gano+T","gano+ t","gano+t","gano+-t","g4n0+ t","ganoplus t"],"countries":"PE","countries_detail":{"PE":{"code":"146264","price":92.5,"currency":"PEN","usd":24.25}},"codes_by_country":{"PE":"146264"},"prices_by_country":"PE: 92.5 PEN","images":[],"description":"Línea Inmunológica. Países: PE. Precios: PE: 92.5 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_cafe_ganomax","name":"Café Ganomax","sku":"CAFE-GANOMAX","category":"suplemento","line":"Inmunológica","price":50.6,"price_min_usd":38.25,"price_max_usd":62.95,"aliases":["Café Ganomax","Ganomax","Cafe Ganomax","caféganomax","café-ganomax","c4fé g4n0m4x"],"countries":"BO,PE","countries_detail":{"PE":{"code":"141293","price":146.0,"currency":"PEN","usd":38.25},"BO":{"code":"145841","price":435,"currency":"BOB","usd":62.95}},"codes_by_country":{"PE":"141293","BO":"145841"},"prices_by_country":"BO: 435 BOB | PE: 146.0 PEN","images":[],"description":"Línea Inmunológica. Países: BO,PE. Precios: BO: 435 BOB | PE: 146.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_probix","name":"Probix","sku":"PROBIX","category":"suplemento","line":"Inmunológica","price":38.14,"price_min_usd":33.68,"price_max_usd":44.0,"aliases":["pr0b1x"],"countries":"CL,CO,EC,PE,US","countries_detail":{"PE":{"code":"147232","price":129.5,"currency":"PEN","usd":34.0},"EC":{"code":"147571","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"147573","price":36000,"currency":"CLP","usd":38.0},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147570","price":138100,"currency":"COP","usd":33.68}},"codes_by_country":{"PE":"147232","EC":"147571","CL":"147573","US":"","CO":"147570"},"prices_by_country":"CL: 36000 CLP | CO: 138100 COP | EC: 41.0 USD | PE: 129.5 PEN | US: 44.0 USD","images":[],"description":"Línea Inmunológica. Países: CL,CO,EC,PE,US. Precios: CL: 36000 CLP | CO: 138100 COP | EC: 41.0 USD | PE: 129.5 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_thermo_t3","name":"Thermo T3 CL","sku":"THERMO-T3","category":"suplemento","line":"Control de Peso y Medidas","price":42.9,"price_min_usd":33.68,"price_max_usd":62.95,"aliases":["Thermo T3","ThermoT3","Thermo-T3","Termo T3","Thermot T3","thermo t3","thermot3","thermo-t3","th3rm0 t3"],"countries":"AR,BO,BR,CL,CO,CR,EC,ES,MX,PE,US,UY","countries_detail":{"PE":{"code":"142623","price":129.5,"currency":"PEN","usd":34.0},"ES":{"code":"143402","price":41.25,"currency":"EUR","usd":44.75},"EC":{"code":"144931","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"144280","price":36000,"currency":"CLP","usd":38.0},"AR":{"code":"142329","price":45550,"currency":"ARS","usd":45.0},"BR":{"code":"143229","price":221.0,"currency":"BRL","usd":42.0},"BO":{"code":"147327","price":435,"currency":"BOB","usd":62.95},"CR":{"code":"145799","price":25185,"currency":"CRC","usd":47.07},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147318","price":138100,"currency":"COP","usd":33.68},"MX":{"code":"144348","price":750,"currency":"MXN","usd":41.67},"UY":{"code":"149290","price":1710,"currency":"UYU","usd":40.71}},"codes_by_country":{"PE":"142623","ES":"143402","EC":"144931","CL":"144280","AR":"142329","BR":"143229","BO":"147327","CR":"145799","US":"","CO":"147318","MX":"144348","UY":"149290"},"prices_by_country":"AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | EC: 41.0 USD | ES: 41.25 EUR | MX: 750 MXN | PE: 129.5 PEN | US: 44.0 USD | UY: 1710 UYU","images":[],"description":"Línea Control de Peso y Medidas. Países: AR,BO,BR,CL,CO,CR,EC,ES,MX,PE,US,UY. Precios: AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | EC: 41.0 USD | ES: 41.25 EUR | MX: 750 MXN | PE: 129.5 PEN | US: 44.0 USD | UY: 1710 UYU","created":"2026-03-31T00:00:00.000Z"},{"id":"p_nocarb_t","name":"Nocarb-T CL","sku":"NOCARB-T","category":"suplemento","line":"Control de Peso y Medidas","price":43.01,"price_min_usd":33.68,"price_max_usd":62.95,"aliases":["Nocarb-T","Nocarb T","NocarB","No Carb T","Nocarb","nocarb-t","n0c4rb-t"],"countries":"AR,BO,BR,CL,CO,CR,EC,ES,PE,US,UY","countries_detail":{"PE":{"code":"142624","price":129.5,"currency":"PEN","usd":34.0},"ES":{"code":"143692","price":41.25,"currency":"EUR","usd":44.75},"EC":{"code":"144954","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"144279","price":36000,"currency":"CLP","usd":38.0},"AR":{"code":"145711","price":45550,"currency":"ARS","usd":45.0},"BR":{"code":"143231","price":221.0,"currency":"BRL","usd":42.0},"BO":{"code":"147922","price":435,"currency":"BOB","usd":62.95},"CR":{"code":"145765","price":25185,"currency":"CRC","usd":47.07},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147316","price":138100,"currency":"COP","usd":33.68},"UY":{"code":"149289","price":1710,"currency":"UYU","usd":40.71}},"codes_by_country":{"PE":"142624","ES":"143692","EC":"144954","CL":"144279","AR":"145711","BR":"143231","BO":"147922","CR":"145765","US":"","CO":"147316","UY":"149289"},"prices_by_country":"AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | EC: 41.0 USD | ES: 41.25 EUR | PE: 129.5 PEN | US: 44.0 USD | UY: 1710 UYU","images":[],"description":"Línea Control de Peso y Medidas. Países: AR,BO,BR,CL,CO,CR,EC,ES,PE,US,UY. Precios: AR: 45550 ARS | BO: 435 BOB | BR: 221.0 BRL | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | EC: 41.0 USD | ES: 41.25 EUR | PE: 129.5 PEN | US: 44.0 USD | UY: 1710 UYU","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_active_fit_vainilla","name":"Protein Active Fit Vainilla y Canela","sku":"PROTEIN-ACTIVE-FIT-VAINILLA","category":"suplemento","line":"Control de Peso y Medidas","price":48.62,"price_min_usd":38.88,"price_max_usd":67.44,"aliases":["Protein Active Fit - Vainilla y Canela","Protein Active Fit Vanilla","Protein Fit Vainilla","proteinactivefitvainillaycanela","protein-active-fit-vainilla-y-canela","pr0t31n 4ct1v3 f1t v41n1ll4 y c4n3l4"],"countries":"BO,CL,CO,CR,EC,PE,US","countries_detail":{"PE":{"code":"143207","price":149.0,"currency":"PEN","usd":39.0},"EC":{"code":"147019","price":46.25,"currency":"USD","usd":46.25},"CL":{"code":"144340","price":41500,"currency":"CLP","usd":43.75},"CR":{"code":"145782","price":29702,"currency":"CRC","usd":55.52},"BO":{"code":"145847","price":466,"currency":"BOB","usd":67.44},"US":{"code":"","price":49.5,"currency":"USD","usd":49.5},"CO":{"code":"166664","price":159400,"currency":"COP","usd":38.88}},"codes_by_country":{"PE":"143207","EC":"147019","CL":"144340","CR":"145782","BO":"145847","US":"","CO":"166664"},"prices_by_country":"BO: 466 BOB | CL: 41500 CLP | CO: 159400 COP | CR: 29702 CRC | EC: 46.25 USD | PE: 149.0 PEN | US: 49.5 USD","images":[],"description":"Línea Control de Peso y Medidas. Países: BO,CL,CO,CR,EC,PE,US. Precios: BO: 466 BOB | CL: 41500 CLP | CO: 159400 COP | CR: 29702 CRC | EC: 46.25 USD | PE: 149.0 PEN | US: 49.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_active_fit_chocolate","name":"Protein Active Fit Chocolate con Avellanas","sku":"PROTEIN-ACTIVE-FIT-CHOCOLATE","category":"suplemento","line":"Control de Peso y Medidas","price":47.91,"price_min_usd":39.25,"price_max_usd":67.44,"aliases":["Protein Active Fit - Chocolate con Avellanas","Protein Active Fit Chocolate","Protein Fit Choco","proteinactivefitchocolateconavellanas","protein-active-fit-chocolate-con-avellanas","pr0t31n 4ct1v3 f1t ch0c0l4t3 c0n 4v3ll4n45"],"countries":"BO,CL,CO,PE,US","countries_detail":{"PE":{"code":"143208","price":149.5,"currency":"PEN","usd":39.25},"CL":{"code":"144341","price":41750,"currency":"CLP","usd":44.0},"BO":{"code":"145846","price":466,"currency":"BOB","usd":67.44},"US":{"code":"","price":49.5,"currency":"USD","usd":49.5},"CO":{"code":"166665","price":161300,"currency":"COP","usd":39.34}},"codes_by_country":{"PE":"143208","CL":"144341","BO":"145846","US":"","CO":"166665"},"prices_by_country":"BO: 466 BOB | CL: 41750 CLP | CO: 161300 COP | PE: 149.5 PEN | US: 49.5 USD","images":[],"description":"Línea Control de Peso y Medidas. Países: BO,CL,CO,PE,US. Precios: BO: 466 BOB | CL: 41750 CLP | CO: 161300 COP | PE: 149.5 PEN | US: 49.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_biopro_fit","name":"Biopro+ Fit","sku":"BIOPRO-FIT","category":"suplemento","line":"Control de Peso y Medidas","price":36.06,"price_min_usd":28.25,"price_max_usd":52.82,"aliases":["Biopro+ Fit","Biopro Fit","BioproFit","Biopro+Fit","biopro+fit","biopro+-fit","b10pr0+ f1t","bioproplus fit"],"countries":"AR,BO,CL,CO,CR,EC,PE,US,UY","countries_detail":{"PE":{"code":"142167","price":108.0,"currency":"PEN","usd":28.25},"EC":{"code":"144155","price":35.45,"currency":"USD","usd":35.45},"CL":{"code":"144268","price":30250,"currency":"CLP","usd":31.75},"AR":{"code":"142539","price":37950,"currency":"ARS","usd":37.5},"CR":{"code":"145784","price":21170,"currency":"CRC","usd":39.57},"BO":{"code":"145851","price":365,"currency":"BOB","usd":52.82},"US":{"code":"","price":37.0,"currency":"USD","usd":37.0},"CO":{"code":"143218","price":115900,"currency":"COP","usd":28.27},"UY":{"code":"149387","price":1425,"currency":"UYU","usd":33.93}},"codes_by_country":{"PE":"142167","EC":"144155","CL":"144268","AR":"142539","CR":"145784","BO":"145851","US":"","CO":"143218","UY":"149387"},"prices_by_country":"AR: 37950 ARS | BO: 365 BOB | CL: 30250 CLP | CO: 115900 COP | CR: 21170 CRC | EC: 35.45 USD | PE: 108.0 PEN | US: 37.0 USD | UY: 1425 UYU","images":[],"description":"Línea Control de Peso y Medidas. Países: AR,BO,CL,CO,CR,EC,PE,US,UY. Precios: AR: 37950 ARS | BO: 365 BOB | CL: 30250 CLP | CO: 115900 COP | CR: 21170 CRC | EC: 35.45 USD | PE: 108.0 PEN | US: 37.0 USD | UY: 1425 UYU","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_xoup_criolla","name":"Protein Xoup Crema Criolla CL","sku":"PROTEIN-XOUP-CRIOLLA","category":"suplemento","line":"Control de Peso y Medidas","price":17.75,"price_min_usd":17.75,"price_max_usd":17.75,"aliases":["Protein Xoup","ProteinXoup","Protein Soup Criolla","protein xoup crema criolla","proteinxoupcremacriolla","protein-xoup-crema-criolla","pr0t31n x0up cr3m4 cr10ll4"],"countries":"PE","countries_detail":{"PE":{"code":"142456","price":68.0,"currency":"PEN","usd":17.75}},"codes_by_country":{"PE":"142456"},"prices_by_country":"PE: 68.0 PEN","images":[],"description":"Línea Control de Peso y Medidas. Países: PE. Precios: PE: 68.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_xoup_brocoli","name":"Protein Xoup Crema Brócoli Parmesano CL","sku":"PROTEIN-XOUP-BROCOLI","category":"suplemento","line":"Control de Peso y Medidas","price":17.75,"price_min_usd":17.75,"price_max_usd":17.75,"aliases":["Protein Xoup Brocoli","Protein Soup Brocoli","protein xoup crema brócoli parmesano","proteinxoupcremabrócoliparmesano","protein-xoup-crema-brócoli-parmesano","pr0t31n x0up cr3m4 bróc0l1 p4rm354n0"],"countries":"PE","countries_detail":{"PE":{"code":"142455","price":68.0,"currency":"PEN","usd":17.75}},"codes_by_country":{"PE":"142455"},"prices_by_country":"PE: 68.0 PEN","images":[],"description":"Línea Control de Peso y Medidas. Países: PE. Precios: PE: 68.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_xoup_esparragos","name":"Protein Xoup Crema Espárragos y Alcachofa CL","sku":"PROTEIN-XOUP-ESPARRAGOS","category":"suplemento","line":"Control de Peso y Medidas","price":17.75,"price_min_usd":17.75,"price_max_usd":17.75,"aliases":["Protein Xoup Esparragos","Protein Soup Esparragos","protein xoup crema espárragos y alcachofa","proteinxoupcremaespárragosyalcachofa","protein-xoup-crema-espárragos-y-alcachofa","pr0t31n x0up cr3m4 35párr4g05 y 4lc4ch0f4"],"countries":"PE","countries_detail":{"PE":{"code":"142457","price":68.0,"currency":"PEN","usd":17.75}},"codes_by_country":{"PE":"142457"},"prices_by_country":"PE: 68.0 PEN","images":[],"description":"Línea Control de Peso y Medidas. Países: PE. Precios: PE: 68.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_cafe_cafe_fit","name":"Café & Café Fit","sku":"CAFE-CAFE-FIT","category":"suplemento","line":"Control de Peso y Medidas","price":54.04,"price_min_usd":41.75,"price_max_usd":83.21,"aliases":["Café & Café Fit","Cafe & Cafe Fit","Café Café Fit","CafeCafe Fit","Café&Café Fit","café&caféfit","café-&-café-fit","c4fé & c4fé f1t","café y café fit"],"countries":"BO,CO,CR,ES,MX,PE,US","countries_detail":{"PE":{"code":"141446","price":159.5,"currency":"PEN","usd":41.75},"ES":{"code":"148238","price":50.5,"currency":"EUR","usd":54.75},"CR":{"code":"145774","price":31500,"currency":"CRC","usd":58.88},"BO":{"code":"145863","price":575,"currency":"BOB","usd":83.21},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"141906","price":175900,"currency":"COP","usd":42.9},"MX":{"code":"142078","price":950,"currency":"MXN","usd":52.78}},"codes_by_country":{"PE":"141446","ES":"148238","CR":"145774","BO":"145863","US":"","CO":"141906","MX":"142078"},"prices_by_country":"BO: 575 BOB | CO: 175900 COP | CR: 31500 CRC | ES: 50.5 EUR | MX: 950 MXN | PE: 159.5 PEN | US: 44.0 USD","images":[],"description":"Línea Control de Peso y Medidas. Países: BO,CO,CR,ES,MX,PE,US. Precios: BO: 575 BOB | CO: 175900 COP | CR: 31500 CRC | ES: 50.5 EUR | MX: 950 MXN | PE: 159.5 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_cafe_cafe_fit_cappuccino","name":"Café & Café Fit Cappuccino","sku":"CAFE-CAFE-FIT-CAPPUCCINO","category":"suplemento","line":"Control de Peso y Medidas","price":63.46,"price_min_usd":41.75,"price_max_usd":101.3,"aliases":["Café & Café Fit Cappuccino","Cafe Cafe Fit Cappuccino","café&caféfitcappuccino","café-&-café-fit-cappuccino","c4fé & c4fé f1t c4ppucc1n0","café y café fit cappuccino"],"countries":"BO,CL,CR,MX,PE","countries_detail":{"PE":{"code":"141448","price":159.5,"currency":"PEN","usd":41.75},"CL":{"code":"144202","price":51500,"currency":"CLP","usd":54.25},"CR":{"code":"145773","price":31500,"currency":"CRC","usd":58.88},"BO":{"code":"145842","price":700,"currency":"BOB","usd":101.3},"MX":{"code":"142076","price":1100,"currency":"MXN","usd":61.11}},"codes_by_country":{"PE":"141448","CL":"144202","CR":"145773","BO":"145842","MX":"142076"},"prices_by_country":"BO: 700 BOB | CL: 51500 CLP | CR: 31500 CRC | MX: 1100 MXN | PE: 159.5 PEN","images":[],"description":"Línea Control de Peso y Medidas. Países: BO,CL,CR,MX,PE. Precios: BO: 700 BOB | CL: 51500 CLP | CR: 31500 CRC | MX: 1100 MXN | PE: 159.5 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_chocolate_fit","name":"Chocolate Fit CL","sku":"CHOCOLATE-FIT","category":"suplemento","line":"Control de Peso y Medidas","price":26.57,"price_min_usd":23.78,"price_max_usd":29.5,"aliases":["Chocolate Fit","ChocolateFit","Chocolate Fit CL","chocolate fit","chocolatefit","chocolate-fit","ch0c0l4t3 f1t"],"countries":"CO,EC,PE,US","countries_detail":{"PE":{"code":"142478","price":92.5,"currency":"PEN","usd":24.25},"EC":{"code":"144685","price":28.75,"currency":"USD","usd":28.75},"US":{"code":"","price":29.5,"currency":"USD","usd":29.5},"CO":{"code":"147079","price":97500,"currency":"COP","usd":23.78}},"codes_by_country":{"PE":"142478","EC":"144685","US":"","CO":"147079"},"prices_by_country":"CO: 97500 COP | EC: 28.75 USD | PE: 92.5 PEN | US: 29.5 USD","images":[],"description":"Línea Control de Peso y Medidas. Países: CO,EC,PE,US. Precios: CO: 97500 COP | EC: 28.75 USD | PE: 92.5 PEN | US: 29.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_pack_514","name":"Pack 5/14 CL","sku":"PACK-514","category":"suplemento","line":"Control de Peso y Medidas","price":109.4,"price_min_usd":104.5,"price_max_usd":116.75,"aliases":["Pack 5/14","Pack514","Pack 5 14","pack 5/14","pack5/14","pack-5/14","p4ck 5/14"],"countries":"CL,CO,PE","countries_detail":{"PE":{"code":"145259","price":399.0,"currency":"PEN","usd":104.5},"CL":{"code":"144595","price":111000,"currency":"CLP","usd":116.75},"CO":{"code":"144168","price":438500,"currency":"COP","usd":106.95}},"codes_by_country":{"PE":"145259","CL":"144595","CO":"144168"},"prices_by_country":"CL: 111000 CLP | CO: 438500 COP | PE: 399.0 PEN","images":[],"description":"Línea Control de Peso y Medidas. Países: CL,CO,PE. Precios: CL: 111000 CLP | CO: 438500 COP | PE: 399.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_pack_514_active","name":"Pack 5/14 Active CL","sku":"PACK-514-ACTIVE","category":"suplemento","line":"Control de Peso y Medidas","price":120.62,"price_min_usd":114.0,"price_max_usd":127.25,"aliases":["Pack 5/14 Active","Pack514Active","pack 5/14 active","pack5/14active","pack-5/14-active","p4ck 5/14 4ct1v3"],"countries":"CL,PE","countries_detail":{"PE":{"code":"144915","price":435.0,"currency":"PEN","usd":114.0},"CL":{"code":"149476","price":120900,"currency":"CLP","usd":127.25}},"codes_by_country":{"PE":"144915","CL":"149476"},"prices_by_country":"CL: 120900 CLP | PE: 435.0 PEN","images":[],"description":"Línea Control de Peso y Medidas. Países: CL,PE. Precios: CL: 120900 CLP | PE: 435.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_beauty_in","name":"Beauty-In CL","sku":"BEAUTY-IN","category":"suplemento","line":"Anti-Edad","price":54.35,"price_min_usd":42.75,"price_max_usd":80.32,"aliases":["Beauty-In","Beauty In","BeautyIn","Beauty-In CL","beauty-in","b34uty-1n"],"countries":"AR,BO,BR,CL,CR,EC,ES,MX,PE,US","countries_detail":{"PE":{"code":"143065","price":163.0,"currency":"PEN","usd":42.75},"ES":{"code":"143403","price":43.7,"currency":"EUR","usd":47.5},"EC":{"code":"144737","price":51.3,"currency":"USD","usd":51.3},"CL":{"code":"144270","price":44750,"currency":"CLP","usd":47.0},"AR":{"code":"149623","price":57300,"currency":"ARS","usd":56.25},"BR":{"code":"148492","price":265.0,"currency":"BRL","usd":50.25},"CR":{"code":"145759","price":32293,"currency":"CRC","usd":60.36},"BO":{"code":"147970","price":555,"currency":"BOB","usd":80.32},"US":{"code":"","price":55.0,"currency":"USD","usd":55.0},"MX":{"code":"144441","price":950,"currency":"MXN","usd":52.78}},"codes_by_country":{"PE":"143065","ES":"143403","EC":"144737","CL":"144270","AR":"149623","BR":"148492","CR":"145759","BO":"147970","US":"","MX":"144441"},"prices_by_country":"AR: 57300 ARS | BO: 555 BOB | BR: 265.0 BRL | CL: 44750 CLP | CR: 32293 CRC | EC: 51.3 USD | ES: 43.7 EUR | MX: 950 MXN | PE: 163.0 PEN | US: 55.0 USD","images":[],"description":"Línea Anti-Edad. Países: AR,BO,BR,CL,CR,EC,ES,MX,PE,US. Precios: AR: 57300 ARS | BO: 555 BOB | BR: 265.0 BRL | CL: 44750 CLP | CR: 32293 CRC | EC: 51.3 USD | ES: 43.7 EUR | MX: 950 MXN | PE: 163.0 PEN | US: 55.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_youth_elixir","name":"Youth Elixir CL","sku":"YOUTH-ELIXIR","category":"suplemento","line":"Anti-Edad","price":42.28,"price_min_usd":34.0,"price_max_usd":49.53,"aliases":["Youth Elixir","YouthElixir","Youth-Elixir","Youh Elixir","youth elixir","youthelixir","youth-elixir","y0uth 3l1x1r"],"countries":"AR,BR,CL,CR,EC,ES,PE,US","countries_detail":{"PE":{"code":"145082","price":129.5,"currency":"PEN","usd":34.0},"ES":{"code":"148240","price":41.25,"currency":"EUR","usd":44.75},"EC":{"code":"145004","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"145085","price":36000,"currency":"CLP","usd":38.0},"AR":{"code":"147257","price":45550,"currency":"ARS","usd":45.0},"BR":{"code":"147145","price":221.0,"currency":"BRL","usd":42.0},"CR":{"code":"147387","price":26500,"currency":"CRC","usd":49.53},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0}},"codes_by_country":{"PE":"145082","ES":"148240","EC":"145004","CL":"145085","AR":"147257","BR":"147145","CR":"147387","US":""},"prices_by_country":"AR: 45550 ARS | BR: 221.0 BRL | CL: 36000 CLP | CR: 26500 CRC | EC: 41.0 USD | ES: 41.25 EUR | PE: 129.5 PEN | US: 44.0 USD","images":[],"description":"Línea Anti-Edad. Países: AR,BR,CL,CR,EC,ES,PE,US. Precios: AR: 45550 ARS | BR: 221.0 BRL | CL: 36000 CLP | CR: 26500 CRC | EC: 41.0 USD | ES: 41.25 EUR | PE: 129.5 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_golden_flx","name":"Golden Flx CL","sku":"GOLDEN-FLX","category":"suplemento","line":"Anti-Edad","price":47.34,"price_min_usd":37.05,"price_max_usd":69.46,"aliases":["Golden Flx","GoldenFlx","Golden FLX","Golden-Flx","golden flx","goldenflx","golden-flx","g0ld3n flx"],"countries":"BO,CL,CO,CR,EC,ES,MX,PE,US","countries_detail":{"PE":{"code":"143142","price":143.0,"currency":"PEN","usd":37.5},"ES":{"code":"148239","price":45.5,"currency":"EUR","usd":49.5},"EC":{"code":"143848","price":45.15,"currency":"USD","usd":45.15},"CL":{"code":"144275","price":39250,"currency":"CLP","usd":41.25},"CR":{"code":"145791","price":27700,"currency":"CRC","usd":51.78},"BO":{"code":"145856","price":480,"currency":"BOB","usd":69.46},"US":{"code":"","price":48.5,"currency":"USD","usd":48.5},"CO":{"code":"147642","price":151900,"currency":"COP","usd":37.05},"MX":{"code":"143871","price":825,"currency":"MXN","usd":45.83}},"codes_by_country":{"PE":"143142","ES":"148239","EC":"143848","CL":"144275","CR":"145791","BO":"145856","US":"","CO":"147642","MX":"143871"},"prices_by_country":"BO: 480 BOB | CL: 39250 CLP | CO: 151900 COP | CR: 27700 CRC | EC: 45.15 USD | ES: 45.5 EUR | MX: 825 MXN | PE: 143.0 PEN | US: 48.5 USD","images":[],"description":"Línea Anti-Edad. Países: BO,CL,CO,CR,EC,ES,MX,PE,US. Precios: BO: 480 BOB | CL: 39250 CLP | CO: 151900 COP | CR: 27700 CRC | EC: 45.15 USD | ES: 45.5 EUR | MX: 825 MXN | PE: 143.0 PEN | US: 48.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_passion","name":"Passion CL","sku":"PASSION","category":"suplemento","line":"Anti-Edad","price":43.38,"price_min_usd":33.68,"price_max_usd":62.95,"aliases":["Passion","Passion CL","PassionCL","passion","p45510n"],"countries":"AR,BO,CL,CO,CR,EC,ES,PE,US","countries_detail":{"PE":{"code":"142477","price":129.5,"currency":"PEN","usd":34.0},"ES":{"code":"148241","price":41.25,"currency":"EUR","usd":44.75},"EC":{"code":"144927","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"144277","price":36000,"currency":"CLP","usd":38.0},"AR":{"code":"142428","price":45550,"currency":"ARS","usd":45.0},"CR":{"code":"145794","price":25185,"currency":"CRC","usd":47.07},"BO":{"code":"145858","price":435,"currency":"BOB","usd":62.95},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147643","price":138100,"currency":"COP","usd":33.68}},"codes_by_country":{"PE":"142477","ES":"148241","EC":"144927","CL":"144277","AR":"142428","CR":"145794","BO":"145858","US":"","CO":"147643"},"prices_by_country":"AR: 45550 ARS | BO: 435 BOB | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | EC: 41.0 USD | ES: 41.25 EUR | PE: 129.5 PEN | US: 44.0 USD","images":[],"description":"Línea Anti-Edad. Países: AR,BO,CL,CO,CR,EC,ES,PE,US. Precios: AR: 45550 ARS | BO: 435 BOB | CL: 36000 CLP | CO: 138100 COP | CR: 25185 CRC | EC: 41.0 USD | ES: 41.25 EUR | PE: 129.5 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_probal","name":"Probal CL","sku":"PROBAL","category":"suplemento","line":"Anti-Edad","price":53.74,"price_min_usd":42.1,"price_max_usd":78.87,"aliases":["Probal","Probal CL","probal","pr0b4l"],"countries":"BO,CL,CO,CR,EC,MX,PE,US","countries_detail":{"PE":{"code":"142472","price":162.5,"currency":"PEN","usd":42.5},"EC":{"code":"143393","price":51.3,"currency":"USD","usd":51.3},"CL":{"code":"144230","price":44750,"currency":"CLP","usd":47.0},"CR":{"code":"147620","price":32293,"currency":"CRC","usd":60.36},"BO":{"code":"145860","price":545,"currency":"BOB","usd":78.87},"US":{"code":"","price":55.0,"currency":"USD","usd":55.0},"CO":{"code":"147641","price":172600,"currency":"COP","usd":42.1},"MX":{"code":"141962","price":950,"currency":"MXN","usd":52.78}},"codes_by_country":{"PE":"142472","EC":"143393","CL":"144230","CR":"147620","BO":"145860","US":"","CO":"147641","MX":"141962"},"prices_by_country":"BO: 545 BOB | CL: 44750 CLP | CO: 172600 COP | CR: 32293 CRC | EC: 51.3 USD | MX: 950 MXN | PE: 162.5 PEN | US: 55.0 USD","images":[],"description":"Línea Anti-Edad. Países: BO,CL,CO,CR,EC,MX,PE,US. Precios: BO: 545 BOB | CL: 44750 CLP | CO: 172600 COP | CR: 32293 CRC | EC: 51.3 USD | MX: 950 MXN | PE: 162.5 PEN | US: 55.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_lussôme_ojos","name":"LUSSÔME Sérum Contorno de Ojos","sku":"LUSSÔME-OJOS","category":"suplemento","line":"Cosmecéutica","price":45.75,"price_min_usd":45.75,"price_max_usd":45.75,"aliases":["Lussôme Sérum Ojos","Lussôme Ojo","Lussome Serum","lussômesérumcontornodeojos","lussôme-sérum-contorno-de-ojos","lu55ôm3 5érum c0nt0rn0 d3 0j05"],"countries":"PE","countries_detail":{"PE":{"code":"144377","price":174.5,"currency":"PEN","usd":45.75}},"codes_by_country":{"PE":"144377"},"prices_by_country":"PE: 174.5 PEN","images":[],"description":"Línea Cosmecéutica. Países: PE. Precios: PE: 174.5 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_lussôme_hidratante","name":"LUSSÔME Sérum Hidratante Concentrado","sku":"LUSSÔME-HIDRATANTE","category":"suplemento","line":"Cosmecéutica","price":50.25,"price_min_usd":50.25,"price_max_usd":50.25,"aliases":["lussômesérumhidratanteconcentrado","lussôme-sérum-hidratante-concentrado","lu55ôm3 5érum h1dr4t4nt3 c0nc3ntr4d0"],"countries":"PE","countries_detail":{"PE":{"code":"144378","price":192.0,"currency":"PEN","usd":50.25}},"codes_by_country":{"PE":"144378"},"prices_by_country":"PE: 192.0 PEN","images":[],"description":"Línea Cosmecéutica. Países: PE. Precios: PE: 192.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_lussôme_regenerador","name":"LUSSÔME Sérum Regenerador Concentrado","sku":"LUSSÔME-REGENERADOR","category":"suplemento","line":"Cosmecéutica","price":54.5,"price_min_usd":54.5,"price_max_usd":54.5,"aliases":["lussômesérumregeneradorconcentrado","lussôme-sérum-regenerador-concentrado","lu55ôm3 5érum r3g3n3r4d0r c0nc3ntr4d0"],"countries":"PE","countries_detail":{"PE":{"code":"144379","price":208.0,"currency":"PEN","usd":54.5}},"codes_by_country":{"PE":"144379"},"prices_by_country":"PE: 208.0 PEN","images":[],"description":"Línea Cosmecéutica. Países: PE. Precios: PE: 208.0 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_galeon_shampoo","name":"GALEON XXI Shampoo Fortalecedor","sku":"GALEON-SHAMPOO","category":"suplemento","line":"Cosmecéutica","price":13.25,"price_min_usd":13.25,"price_max_usd":13.25,"aliases":["Galeon XXI Shampoo","Galeon 21","Galeon XXI","galeonxxishampoofortalecedor","galeon-xxi-shampoo-fortalecedor","g4l30n xx1 5h4mp00 f0rt4l3c3d0r"],"countries":"PE","countries_detail":{"PE":{"code":"144380","price":50.5,"currency":"PEN","usd":13.25}},"codes_by_country":{"PE":"144380"},"prices_by_country":"PE: 50.5 PEN","images":[],"description":"Línea Cosmecéutica. Países: PE. Precios: PE: 50.5 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_no_stress","name":"No Stress CL","sku":"NO-STRESS","category":"suplemento","line":"Vigor Mental","price":47.65,"price_min_usd":37.25,"price_max_usd":69.25,"aliases":["No Stress","NoStress","No-Stress","No Stress CL","no stress","nostress","no-stress","n0 5tr355"],"countries":"BO,CL,EC,ES,PE","countries_detail":{"PE":{"code":"143070","price":142.5,"currency":"PEN","usd":37.25},"ES":{"code":"145104","price":45.5,"currency":"EUR","usd":49.5},"EC":{"code":"143394","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"144236","price":39250,"currency":"CLP","usd":41.25},"BO":{"code":"145856","price":480,"currency":"BOB","usd":69.25}},"codes_by_country":{"PE":"143070","ES":"145104","EC":"143394","CL":"144236","BO":"145856"},"prices_by_country":"BO: 480 BOB | CL: 39250 CLP | EC: 41.0 USD | ES: 45.5 EUR | PE: 142.5 PEN","images":[],"description":"Línea Vigor Mental. Países: BO,CL,EC,ES,PE. Precios: BO: 480 BOB | CL: 39250 CLP | EC: 41.0 USD | ES: 45.5 EUR | PE: 142.5 PEN","created":"2026-03-31T00:00:00.000Z"},{"id":"p_on_cl","name":"On CL","sku":"ON-CL","category":"suplemento","line":"Vigor Mental","price":38.47,"price_min_usd":26.93,"price_max_usd":53.55,"aliases":["On CL","OnCL","On Fuxion","On+"],"countries":"AR,BO,CL,CO,CR,EC,ES,PE,US","countries_detail":{"PE":{"code":"143066","price":105.0,"currency":"PEN","usd":27.5},"ES":{"code":"143691","price":35.0,"currency":"EUR","usd":38.0},"EC":{"code":"144956","price":41.0,"currency":"USD","usd":41.0},"CL":{"code":"144276","price":28750,"currency":"CLP","usd":30.25},"AR":{"code":"149628","price":45550,"currency":"ARS","usd":45.0},"BO":{"code":"144603","price":370,"currency":"BOB","usd":53.55},"CR":{"code":"145764","price":21389,"currency":"CRC","usd":39.98},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147563","price":110400,"currency":"COP","usd":26.93}},"codes_by_country":{"PE":"143066","ES":"143691","EC":"144956","CL":"144276","AR":"149628","BO":"144603","CR":"145764","US":"","CO":"147563"},"prices_by_country":"AR: 45550 ARS | BO: 370 BOB | CL: 28750 CLP | CO: 110400 COP | CR: 21389 CRC | EC: 41.0 USD | ES: 35.0 EUR | PE: 105.0 PEN | US: 44.0 USD","images":[],"description":"Línea Vigor Mental. Países: AR,BO,CL,CO,CR,EC,ES,PE,US. Precios: AR: 45550 ARS | BO: 370 BOB | CL: 28750 CLP | CO: 110400 COP | CR: 21389 CRC | EC: 41.0 USD | ES: 35.0 EUR | PE: 105.0 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_off_cl","name":"Off CL","sku":"OFF-CL","category":"suplemento","line":"Vigor Mental","price":49.46,"price_min_usd":37.05,"price_max_usd":69.46,"aliases":["Off CL","OffCL","Off Fuxion","off","0ff"],"countries":"AR,BO,CO,CR,US","countries_detail":{"AR":{"code":"142527","price":45550,"currency":"ARS","usd":45.0},"CR":{"code":"144528","price":27700,"currency":"CRC","usd":51.78},"BO":{"code":"144602","price":480,"currency":"BOB","usd":69.46},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"CO":{"code":"147649","price":151900,"currency":"COP","usd":37.05}},"codes_by_country":{"AR":"142527","CR":"144528","BO":"144602","US":"","CO":"147649"},"prices_by_country":"AR: 45550 ARS | BO: 480 BOB | CO: 151900 COP | CR: 27700 CRC | US: 44.0 USD","images":[],"description":"Línea Vigor Mental. Países: AR,BO,CO,CR,US. Precios: AR: 45550 ARS | BO: 480 BOB | CO: 151900 COP | CR: 27700 CRC | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_active_sport_vainilla","name":"Protein Active Sport Vainilla y Canela","sku":"PROTEIN-ACTIVE-SPORT-VAINILLA","category":"suplemento","line":"Sport","price":50.41,"price_min_usd":40.73,"price_max_usd":72.07,"aliases":["Protein Active Sport - Vainilla y Canela","Protein Sport Vainilla","Protein Active Sport VC","proteinactivesportvainillaycanela","protein-active-sport-vainilla-y-canela","pr0t31n 4ct1v3 5p0rt v41n1ll4 y c4n3l4"],"countries":"BO,CL,CO,PE,US","countries_detail":{"PE":{"code":"143286","price":156.0,"currency":"PEN","usd":40.75},"CL":{"code":"144688","price":43250,"currency":"CLP","usd":45.5},"BO":{"code":"145849","price":498,"currency":"BOB","usd":72.07},"US":{"code":"","price":53.0,"currency":"USD","usd":53.0},"CO":{"code":"166666","price":167000,"currency":"COP","usd":40.73}},"codes_by_country":{"PE":"143286","CL":"144688","BO":"145849","US":"","CO":"166666"},"prices_by_country":"BO: 498 BOB | CL: 43250 CLP | CO: 167000 COP | PE: 156.0 PEN | US: 53.0 USD","images":[],"description":"Línea Sport. Países: BO,CL,CO,PE,US. Precios: BO: 498 BOB | CL: 43250 CLP | CO: 167000 COP | PE: 156.0 PEN | US: 53.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_protein_active_sport_chocolate","name":"Protein Active Sport Chocolate con Avellanas","sku":"PROTEIN-ACTIVE-SPORT-CHOCOLATE","category":"suplemento","line":"Sport","price":51.66,"price_min_usd":41.0,"price_max_usd":72.07,"aliases":["Protein Active Sport – Chocolate con Avellanas","Protein Sport Chocolate","Protein Active Sport Choco","proteinactivesportchocolateconavellanas","protein-active-sport-chocolate-con-avellanas","pr0t31n 4ct1v3 5p0rt ch0c0l4t3 c0n 4v3ll4n45"],"countries":"BO,CL,EC,PE,US","countries_detail":{"PE":{"code":"143287","price":156.5,"currency":"PEN","usd":41.0},"EC":{"code":"147020","price":46.25,"currency":"USD","usd":46.25},"CL":{"code":"144689","price":43750,"currency":"CLP","usd":46.0},"BO":{"code":"145848","price":498,"currency":"BOB","usd":72.07},"US":{"code":"","price":53.0,"currency":"USD","usd":53.0}},"codes_by_country":{"PE":"143287","EC":"147020","CL":"144689","BO":"145848","US":""},"prices_by_country":"BO: 498 BOB | CL: 43750 CLP | EC: 46.25 USD | PE: 156.5 PEN | US: 53.0 USD","images":[],"description":"Línea Sport. Países: BO,CL,EC,PE,US. Precios: BO: 498 BOB | CL: 43750 CLP | EC: 46.25 USD | PE: 156.5 PEN | US: 53.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_biopro_sport","name":"Biopro+ Sport","sku":"BIOPRO-SPORT","category":"suplemento","line":"Sport","price":41.8,"price_min_usd":34.75,"price_max_usd":52.82,"aliases":["Biopro+ Sport","Biopro Sport","Biopro+Sport","BioproSport","Biopro Sport +","biopro+sport","biopro+-sport","b10pr0+ 5p0rt","bioproplus sport"],"countries":"AR,BO,CL,CO,CR,EC,ES,PE,US","countries_detail":{"PE":{"code":"143288","price":132.5,"currency":"PEN","usd":34.75},"ES":{"code":"147167","price":43.0,"currency":"EUR","usd":46.75},"EC":{"code":"144307","price":35.45,"currency":"USD","usd":35.45},"CL":{"code":"144283","price":37750,"currency":"CLP","usd":39.75},"AR":{"code":"149633","price":46550,"currency":"ARS","usd":45.75},"CR":{"code":"145802","price":21170,"currency":"CRC","usd":39.57},"BO":{"code":"145861","price":365,"currency":"BOB","usd":52.82},"US":{"code":"","price":46.0,"currency":"USD","usd":46.0},"CO":{"code":"143968","price":145000,"currency":"COP","usd":35.37}},"codes_by_country":{"PE":"143288","ES":"147167","EC":"144307","CL":"144283","AR":"149633","CR":"145802","BO":"145861","US":"","CO":"143968"},"prices_by_country":"AR: 46550 ARS | BO: 365 BOB | CL: 37750 CLP | CO: 145000 COP | CR: 21170 CRC | EC: 35.45 USD | ES: 43.0 EUR | PE: 132.5 PEN | US: 46.0 USD","images":[],"description":"Línea Sport. Países: AR,BO,CL,CO,CR,EC,ES,PE,US. Precios: AR: 46550 ARS | BO: 365 BOB | CL: 37750 CLP | CO: 145000 COP | CR: 21170 CRC | EC: 35.45 USD | ES: 43.0 EUR | PE: 132.5 PEN | US: 46.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_pre_sport","name":"Pre Sport CL","sku":"PRE-SPORT","category":"suplemento","line":"Sport","price":47.58,"price_min_usd":37.02,"price_max_usd":69.46,"aliases":["Pre Sport","PreSport","Pre-Sport","pre sport","presport","pre-sport","pr3 5p0rt"],"countries":"AR,BO,CL,CO,CR,EC,ES,MX,PE,US","countries_detail":{"PE":{"code":"143284","price":143.0,"currency":"PEN","usd":37.5},"ES":{"code":"147166","price":46.0,"currency":"EUR","usd":50.0},"EC":{"code":"147075","price":45.15,"currency":"USD","usd":45.15},"CL":{"code":"144244","price":39250,"currency":"CLP","usd":41.25},"AR":{"code":"147541","price":50050,"currency":"ARS","usd":49.25},"BO":{"code":"145864","price":480,"currency":"BOB","usd":69.46},"CR":{"code":"145796","price":27717,"currency":"CRC","usd":51.81},"US":{"code":"","price":48.5,"currency":"USD","usd":48.5},"CO":{"code":"166661","price":151800,"currency":"COP","usd":37.02},"MX":{"code":"144442","price":825,"currency":"MXN","usd":45.83}},"codes_by_country":{"PE":"143284","ES":"147166","EC":"147075","CL":"144244","AR":"147541","BO":"145864","CR":"145796","US":"","CO":"166661","MX":"144442"},"prices_by_country":"AR: 50050 ARS | BO: 480 BOB | CL: 39250 CLP | CO: 151800 COP | CR: 27717 CRC | EC: 45.15 USD | ES: 46.0 EUR | MX: 825 MXN | PE: 143.0 PEN | US: 48.5 USD","images":[],"description":"Línea Sport. Países: AR,BO,CL,CO,CR,EC,ES,MX,PE,US. Precios: AR: 50050 ARS | BO: 480 BOB | CL: 39250 CLP | CO: 151800 COP | CR: 27717 CRC | EC: 45.15 USD | ES: 46.0 EUR | MX: 825 MXN | PE: 143.0 PEN | US: 48.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_post_sport","name":"Post Sport CL","sku":"POST-SPORT","category":"suplemento","line":"Sport","price":47.58,"price_min_usd":37.02,"price_max_usd":69.46,"aliases":["Post Sport","PostSport","Post-Sport","post sport","postsport","post-sport","p05t 5p0rt"],"countries":"AR,BO,CL,CO,CR,EC,ES,MX,PE,US","countries_detail":{"PE":{"code":"143285","price":143.0,"currency":"PEN","usd":37.5},"ES":{"code":"147165","price":46.0,"currency":"EUR","usd":50.0},"EC":{"code":"147074","price":45.15,"currency":"USD","usd":45.15},"CL":{"code":"144278","price":39250,"currency":"CLP","usd":41.25},"AR":{"code":"147540","price":50050,"currency":"ARS","usd":49.25},"BO":{"code":"145859","price":480,"currency":"BOB","usd":69.46},"CR":{"code":"145795","price":27717,"currency":"CRC","usd":51.81},"US":{"code":"","price":48.5,"currency":"USD","usd":48.5},"CO":{"code":"144955","price":151800,"currency":"COP","usd":37.02},"MX":{"code":"144443","price":825,"currency":"MXN","usd":45.83}},"codes_by_country":{"PE":"143285","ES":"147165","EC":"147074","CL":"144278","AR":"147540","BO":"145859","CR":"145795","US":"","CO":"144955","MX":"144443"},"prices_by_country":"AR: 50050 ARS | BO: 480 BOB | CL: 39250 CLP | CO: 151800 COP | CR: 27717 CRC | EC: 45.15 USD | ES: 46.0 EUR | MX: 825 MXN | PE: 143.0 PEN | US: 48.5 USD","images":[],"description":"Línea Sport. Países: AR,BO,CL,CO,CR,EC,ES,MX,PE,US. Precios: AR: 50050 ARS | BO: 480 BOB | CL: 39250 CLP | CO: 151800 COP | CR: 27717 CRC | EC: 45.15 USD | ES: 46.0 EUR | MX: 825 MXN | PE: 143.0 PEN | US: 48.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_xtra_mile","name":"Xtra Mile CL","sku":"XTRA-MILE","category":"suplemento","line":"Sport","price":41.17,"price_min_usd":34.0,"price_max_usd":45.0,"aliases":["Xtra Mile","XtraMile","Extra Mile","Xtra-Mile","xtra mile","xtramile","xtra-mile","xtr4 m1l3"],"countries":"AR,MX,PE,US","countries_detail":{"PE":{"code":"143283","price":129.5,"currency":"PEN","usd":34.0},"AR":{"code":"149634","price":45550,"currency":"ARS","usd":45.0},"US":{"code":"","price":44.0,"currency":"USD","usd":44.0},"MX":{"code":"144444","price":750,"currency":"MXN","usd":41.67}},"codes_by_country":{"PE":"143283","AR":"149634","US":"","MX":"144444"},"prices_by_country":"AR: 45550 ARS | MX: 750 MXN | PE: 129.5 PEN | US: 44.0 USD","images":[],"description":"Línea Sport. Países: AR,MX,PE,US. Precios: AR: 45550 ARS | MX: 750 MXN | PE: 129.5 PEN | US: 44.0 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_qocina_verde","name":"Q'ocina en Casa Base Madre Verde","sku":"QOCINA-VERDE","category":"suplemento","line":"Gastronómica","price":9.16,"price_min_usd":6.25,"price_max_usd":15.5,"aliases":["Q'ocina Base Verde","Qocina Verde","Q'ocina en Casa Verde","q'ocinaencasabasemadreverde","q'ocina-en-casa-base-madre-verde","q'0c1n4 3n c454 b453 m4dr3 v3rd3"],"countries":"CL,CO,EC,PE,US","countries_detail":{"PE":{"code":"147146","price":24.0,"currency":"PEN","usd":6.25},"EC":{"code":"147450","price":6.9,"currency":"USD","usd":6.9},"CL":{"code":"147482","price":8950,"currency":"CLP","usd":9.4},"US":{"code":"","price":15.5,"currency":"USD","usd":15.5},"CO":{"code":"147449","price":31800,"currency":"COP","usd":7.76}},"codes_by_country":{"PE":"147146","EC":"147450","CL":"147482","US":"","CO":"147449"},"prices_by_country":"CL: 8950 CLP | CO: 31800 COP | EC: 6.9 USD | PE: 24.0 PEN | US: 15.5 USD","images":[],"description":"Línea Gastronómica. Países: CL,CO,EC,PE,US. Precios: CL: 8950 CLP | CO: 31800 COP | EC: 6.9 USD | PE: 24.0 PEN | US: 15.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_qocina_amarilla","name":"Q'ocina en Casa Base Madre Amarilla","sku":"QOCINA-AMARILLA","category":"suplemento","line":"Gastronómica","price":9.16,"price_min_usd":6.25,"price_max_usd":15.5,"aliases":["Q'ocina Base Amarilla","Qocina Amarilla","q'ocinaencasabasemadreamarilla","q'ocina-en-casa-base-madre-amarilla","q'0c1n4 3n c454 b453 m4dr3 4m4r1ll4"],"countries":"CL,CO,EC,PE,US","countries_detail":{"PE":{"code":"147147","price":24.0,"currency":"PEN","usd":6.25},"EC":{"code":"147446","price":6.9,"currency":"USD","usd":6.9},"CL":{"code":"147480","price":8950,"currency":"CLP","usd":9.4},"US":{"code":"","price":15.5,"currency":"USD","usd":15.5},"CO":{"code":"147445","price":31800,"currency":"COP","usd":7.76}},"codes_by_country":{"PE":"147147","EC":"147446","CL":"147480","US":"","CO":"147445"},"prices_by_country":"CL: 8950 CLP | CO: 31800 COP | EC: 6.9 USD | PE: 24.0 PEN | US: 15.5 USD","images":[],"description":"Línea Gastronómica. Países: CL,CO,EC,PE,US. Precios: CL: 8950 CLP | CO: 31800 COP | EC: 6.9 USD | PE: 24.0 PEN | US: 15.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_qocina_roja","name":"Q'ocina en Casa Base Madre Roja","sku":"QOCINA-ROJA","category":"suplemento","line":"Gastronómica","price":9.16,"price_min_usd":6.25,"price_max_usd":15.5,"aliases":["Q'ocina Base Roja","Qocina Roja","q'ocinaencasabasemadreroja","q'ocina-en-casa-base-madre-roja","q'0c1n4 3n c454 b453 m4dr3 r0j4"],"countries":"CL,CO,EC,PE,US","countries_detail":{"PE":{"code":"147148","price":24.0,"currency":"PEN","usd":6.25},"EC":{"code":"147448","price":6.9,"currency":"USD","usd":6.9},"CL":{"code":"147481","price":8950,"currency":"CLP","usd":9.4},"US":{"code":"","price":15.5,"currency":"USD","usd":15.5},"CO":{"code":"147447","price":31800,"currency":"COP","usd":7.76}},"codes_by_country":{"PE":"147148","EC":"147448","CL":"147481","US":"","CO":"147447"},"prices_by_country":"CL: 8950 CLP | CO: 31800 COP | EC: 6.9 USD | PE: 24.0 PEN | US: 15.5 USD","images":[],"description":"Línea Gastronómica. Países: CL,CO,EC,PE,US. Precios: CL: 8950 CLP | CO: 31800 COP | EC: 6.9 USD | PE: 24.0 PEN | US: 15.5 USD","created":"2026-03-31T00:00:00.000Z"},{"id":"p_1914_pack","name":"1914 Pack","sku":"1914-PACK","category":"suplemento","line":"Control de Peso y Medidas","price":170.0,"price_min_usd":170.0,"price_max_usd":170.0,"aliases":["1914Pack","Pack 1914","Paquete 1914","1914 package"],"countries":"US","countries_detail":{"US":{"code":"","price":170.0,"currency":"USD","usd":170.0}},"codes_by_country":{},"prices_by_country":"US: 170.00 USD","description":"Línea Control de Peso y Medidas. Países: US. Pack exclusivo USA.","images":[],"created":"2026-03-31T00:00:00.000Z"},{"id":"p_hgh_cl","name":"Hgh CL","sku":"HGH-CL","category":"suplemento","line":"Anti-Edad","price":53.42,"price_min_usd":43.89,"price_max_usd":62.95,"aliases":["Hgh","HGH CL","H.G.H","HGH Fuxion","hgh cl","h g h"],"countries":"BO,MX","countries_detail":{"BO":{"code":"144601","price":435,"currency":"BOB","usd":62.95},"MX":{"code":"145006","price":790,"currency":"MXN","usd":43.89}},"codes_by_country":{"BO":"144601","MX":"145006"},"prices_by_country":"BO: 435 BOB | MX: 790 MXN","description":"Línea Anti-Edad. Países: BO,MX. Precios: BO: 435 BOB | MX: 790 MXN","images":[],"created":"2026-03-31T00:00:00.000Z"},{"id":"p_cool_age_cl","name":"Cool Age CL","sku":"COOL-AGE-CL","category":"suplemento","line":"Anti-Edad","price":42.1,"price_min_usd":42.1,"price_max_usd":42.1,"aliases":["cool age","coolage","cool-age","c00l ag3"],"countries":"CO","countries_detail":{"CO":{"code":"147560","price":172600,"currency":"COP","usd":42.1}},"codes_by_country":{"CO":"147560"},"prices_by_country":"CO: 172600 COP","images":[],"created":"2026-03-31T00:00:00.000Z","description":"Línea Anti-Edad. Países: CO."},{"id":"p_elixir_hgh_cl","name":"Elixir Hgh CL","sku":"ELIXIR-HGH-CL","category":"suplemento","line":"Anti-Edad","price":33.68,"price_min_usd":33.68,"price_max_usd":33.68,"aliases":["elixir hgh","elixirhgh","elixir-hgh","3l1x1r hgh"],"countries":"CO","countries_detail":{"CO":{"code":"147650","price":138100,"currency":"COP","usd":33.68}},"codes_by_country":{"CO":"147650"},"prices_by_country":"CO: 138100 COP","images":[],"created":"2026-03-31T00:00:00.000Z","description":"Línea Anti-Edad. Países: CO."},{"id":"p_n_forma_t","name":"N Forma-T CL","sku":"N-FORMA-T","category":"suplemento","line":"Control de Peso y Medidas","price":41.67,"price_min_usd":41.67,"price_max_usd":41.67,"aliases":["n forma-t","nforma-t","n-forma-t","n f0rma-t"],"countries":"MX","countries_detail":{"MX":{"code":"143872","price":750,"currency":"MXN","usd":41.67}},"codes_by_country":{"MX":"143872"},"prices_by_country":"MX: 750 MXN","images":[],"created":"2026-03-31T00:00:00.000Z","description":"Línea Control de Peso y Medidas. Países: MX."}];
+  const existing = DB.get('products', []);
+  if (existing.length === 0) {
+    const withImages = CATALOG.map(p => ({...p, images:[]}));
+    DB.set('products', withImages);
+    products = withImages;
+    console.log('Catálogo importado automáticamente:', withImages.length, 'productos');
+  }
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+  renderDashboard();
+  renderCatalog();
+  updateAlertBadge();
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('es', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+});
+</script>
+</body>
+</html>
