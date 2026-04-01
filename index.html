@@ -1,0 +1,1545 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FuXion · Brand Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0c0f;
+  --bg2: #111418;
+  --bg3: #181d23;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text: #e8eaed;
+  --text2: #8b9099;
+  --text3: #555d6b;
+  --accent: #00e5a0;
+  --accent2: #00b87a;
+  --warn: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
+  --purple: #a78bfa;
+  --font: 'DM Sans', sans-serif;
+  --mono: 'DM Mono', monospace;
+  --r: 10px;
+  --r2: 16px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--font); background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; }
+
+/* SIDEBAR */
+.layout { display: flex; min-height: 100vh; }
+.sidebar { width: 220px; background: var(--bg2); border-right: 1px solid var(--border); display: flex; flex-direction: column; position: fixed; top: 0; left: 0; height: 100vh; z-index: 100; }
+.logo { padding: 20px 18px 16px; border-bottom: 1px solid var(--border); }
+.logo-name { font-size: 15px; font-weight: 600; color: var(--accent); letter-spacing: .02em; }
+.logo-sub { font-size: 10px; color: var(--text3); margin-top: 2px; font-family: var(--mono); }
+.nav { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; }
+.nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--r); cursor: pointer; color: var(--text2); font-size: 13px; transition: all .15s; user-select: none; }
+.nav-item:hover { background: var(--bg3); color: var(--text); }
+.nav-item.active { background: rgba(0,229,160,.08); color: var(--accent); }
+.nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-badge { margin-left: auto; font-size: 10px; background: var(--danger); color: #fff; border-radius: 999px; padding: 1px 6px; font-weight: 600; }
+.sidebar-bottom { padding: 12px 8px; border-top: 1px solid var(--border); }
+.status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); display: inline-block; margin-right: 6px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+/* MAIN */
+.main { margin-left: 220px; flex: 1; min-height: 100vh; }
+.topbar { padding: 16px 28px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--bg2); position: sticky; top: 0; z-index: 50; }
+.page-title { font-size: 16px; font-weight: 600; color: var(--text); }
+.page-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.topbar-actions { display: flex; gap: 8px; align-items: center; }
+.content { padding: 24px 28px; }
+
+/* BUTTONS */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: var(--r); border: 1px solid var(--border2); background: transparent; color: var(--text); font-size: 12px; font-family: var(--font); cursor: pointer; transition: all .15s; font-weight: 500; }
+.btn:hover { background: var(--bg3); border-color: rgba(255,255,255,.2); }
+.btn-accent { background: var(--accent); color: #000; border-color: var(--accent); font-weight: 600; }
+.btn-accent:hover { background: var(--accent2); border-color: var(--accent2); }
+.btn-danger { background: rgba(239,68,68,.1); color: var(--danger); border-color: rgba(239,68,68,.3); }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+
+/* CARDS */
+.card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 20px; }
+.card-sm { padding: 14px 16px; border-radius: var(--r); }
+
+/* METRICS */
+.metrics-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px; }
+.metric { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 18px 20px; }
+.metric-label { font-size: 11px; color: var(--text3); margin-bottom: 8px; font-family: var(--mono); letter-spacing: .05em; text-transform: uppercase; }
+.metric-val { font-size: 28px; font-weight: 600; color: var(--text); line-height: 1; }
+.metric-delta { font-size: 11px; color: var(--text3); margin-top: 4px; }
+.metric-accent { border-color: rgba(0,229,160,.2); }
+.metric-accent .metric-val { color: var(--accent); }
+.metric-warn .metric-val { color: var(--warn); }
+.metric-danger .metric-accent .metric-val, .metric.danger .metric-val { color: var(--danger); }
+
+/* TABS */
+.tabs { display: flex; gap: 2px; background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r); padding: 3px; margin-bottom: 20px; width: fit-content; }
+.tab { padding: 7px 16px; border-radius: 8px; font-size: 12px; cursor: pointer; color: var(--text2); transition: all .12s; font-weight: 500; }
+.tab.on { background: var(--bg3); color: var(--text); }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th { text-align: left; padding: 10px 14px; color: var(--text3); font-size: 10px; font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase; border-bottom: 1px solid var(--border); font-weight: 500; }
+td { padding: 12px 14px; border-bottom: 1px solid var(--border); color: var(--text); vertical-align: middle; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(255,255,255,.02); }
+
+/* BADGES */
+.badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; padding: 3px 8px; border-radius: 999px; font-weight: 600; white-space: nowrap; }
+.b-green { background: rgba(0,229,160,.1); color: var(--accent); }
+.b-warn { background: rgba(245,158,11,.1); color: var(--warn); }
+.b-danger { background: rgba(239,68,68,.1); color: var(--danger); }
+.b-purple { background: rgba(167,139,250,.1); color: var(--purple); }
+.b-info { background: rgba(59,130,246,.1); color: var(--info); }
+.b-gray { background: rgba(255,255,255,.05); color: var(--text2); }
+
+/* FORMS */
+input[type=text], input[type=email], input[type=url], textarea, select {
+  background: var(--bg3); border: 1px solid var(--border); color: var(--text); border-radius: var(--r); padding: 9px 12px; font-size: 13px; font-family: var(--font); width: 100%; transition: border-color .15s; outline: none;
+}
+input:focus, textarea:focus, select:focus { border-color: var(--accent); }
+select option { background: var(--bg3); }
+.form-row { display: grid; gap: 12px; margin-bottom: 14px; }
+.form-row-2 { grid-template-columns: 1fr 1fr; }
+.form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-row-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+label { display: block; font-size: 11px; color: var(--text3); margin-bottom: 5px; font-family: var(--mono); letter-spacing: .04em; }
+.section-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid var(--border); }
+
+/* SEARCH BAR */
+.search-bar { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-bar input { flex: 1; }
+
+/* PRODUCT CARD */
+.product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.product-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 14px; position: relative; transition: border-color .15s; cursor: default; }
+.product-card:hover { border-color: var(--border2); }
+.product-img { width: 100%; height: 120px; object-fit: cover; border-radius: var(--r); background: var(--bg3); display: flex; align-items: center; justify-content: center; margin-bottom: 10px; overflow: hidden; }
+.product-img img { width: 100%; height: 100%; object-fit: cover; border-radius: var(--r); }
+.product-img-placeholder { color: var(--text3); font-size: 24px; }
+.product-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.product-sku { font-size: 10px; color: var(--text3); font-family: var(--mono); margin-bottom: 8px; }
+.product-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.product-actions { display: flex; gap: 6px; margin-top: 10px; }
+.product-delete { position: absolute; top: 10px; right: 10px; background: rgba(239,68,68,.1); border: none; color: var(--danger); width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity .15s; }
+.product-card:hover .product-delete { opacity: 1; }
+
+/* ALERT ITEM */
+.alert-item { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--r2); padding: 14px 16px; margin-bottom: 8px; display: grid; grid-template-columns: 8px 1fr auto; gap: 14px; align-items: start; }
+.alert-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex-shrink: 0; }
+.alert-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.alert-meta { font-size: 11px; color: var(--text3); display: flex; gap: 12px; flex-wrap: wrap; }
+.alert-snippet { font-size: 11px; color: var(--text2); margin-top: 4px; line-height: 1.5; }
+.alert-snippet mark { background: rgba(245,158,11,.2); color: var(--warn); border-radius: 2px; padding: 0 2px; }
+.alert-actions { display: flex; flex-direction: column; gap: 5px; align-items: flex-end; flex-shrink: 0; }
+
+/* MP GRID */
+.mp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 6px; max-height: 220px; overflow-y: auto; padding: 2px; }
+.mp-chip { display: flex; align-items: center; gap: 6px; padding: 7px 10px; border: 1px solid var(--border); border-radius: var(--r); cursor: pointer; font-size: 11px; color: var(--text2); background: var(--bg2); transition: all .12s; user-select: none; }
+.mp-chip.on { border-color: rgba(0,229,160,.4); background: rgba(0,229,160,.06); color: var(--accent); }
+.mp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+/* REGION TABS */
+.rtabs { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 10px; }
+.rtab { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--border); font-size: 11px; cursor: pointer; color: var(--text2); transition: all .12s; user-select: none; }
+.rtab.on { background: rgba(0,229,160,.08); border-color: rgba(0,229,160,.3); color: var(--accent); }
+
+/* MODAL */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.7); z-index: 200; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.modal { background: var(--bg2); border: 1px solid var(--border2); border-radius: var(--r2); padding: 24px; width: 100%; max-width: 560px; max-height: 80vh; overflow-y: auto; }
+.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 20px; }
+.modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+
+/* AI PANEL */
+.ai-panel { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-top: 16px; }
+.ai-header { font-size: 11px; color: var(--accent); font-family: var(--mono); letter-spacing: .06em; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.ai-text { font-size: 12px; color: var(--text2); line-height: 1.7; }
+
+/* LOADING */
+.dots { display: inline-flex; gap: 3px; }
+.dots span { width: 4px; height: 4px; border-radius: 50%; background: var(--accent); animation: dp 1.2s ease-in-out infinite; }
+.dots span:nth-child(2) { animation-delay: .2s; }
+.dots span:nth-child(3) { animation-delay: .4s; }
+@keyframes dp { 0%,80%,100%{opacity:.2}40%{opacity:1} }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* IMAGE UPLOAD */
+.upload-area { border: 2px dashed var(--border2); border-radius: var(--r); padding: 24px; text-align: center; cursor: pointer; transition: border-color .15s; }
+.upload-area:hover { border-color: var(--accent); }
+.upload-area input { display: none; }
+.img-preview-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
+.img-preview { position: relative; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; background: var(--bg3); }
+.img-preview img { width: 100%; height: 100%; object-fit: cover; }
+.img-preview-del { position: absolute; top: 3px; right: 3px; background: rgba(0,0,0,.7); border: none; color: #fff; width: 18px; height: 18px; border-radius: 50%; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center; }
+
+/* EXPORT */
+.empty-state { text-align: center; padding: 48px 20px; color: var(--text3); }
+.empty-icon { font-size: 32px; margin-bottom: 10px; }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* SCAN PROGRESS */
+.scan-progress { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-bottom: 16px; }
+.progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+.progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .3s; }
+
+/* VARIANTS */
+.variant-tag { display: inline-flex; align-items: center; gap: 4px; background: var(--bg3); border: 1px solid var(--border); border-radius: 999px; padding: 3px 10px; font-size: 10px; color: var(--text2); margin: 2px; }
+
+/* LINK */
+a.link { color: var(--info); text-decoration: none; font-size: 11px; }
+a.link:hover { text-decoration: underline; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sidebar { width: 56px; }
+  .sidebar .logo-name, .sidebar .logo-sub, .nav-item span, .nav-badge { display: none; }
+  .main { margin-left: 56px; }
+  .metrics-row { grid-template-columns: repeat(2, 1fr); }
+  .form-row-4 { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="logo">
+    <div class="logo-name">FuXion Monitor</div>
+    <div class="logo-sub">Brand Protection v1.0</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" onclick="showPage('dashboard')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Dashboard</span>
+    </div>
+    <div class="nav-item" onclick="showPage('catalog')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 3H8a2 2 0 00-2 2v2h12V5a2 2 0 00-2-2z"/></svg>
+      <span>Catálogo</span>
+    </div>
+    <div class="nav-item" onclick="showPage('scan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+      <span>Escanear</span>
+    </div>
+    <div class="nav-item" onclick="showPage('alerts')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span>Alertas</span>
+      <span class="nav-badge" id="alert-badge" style="display:none">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('findings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <span>Hallazgos</span>
+    </div>
+    <div class="nav-item" onclick="showPage('marketplaces')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+      <span>Marketplaces</span>
+    </div>
+    <div class="nav-item" onclick="showPage('config')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      <span>Configuración</span>
+    </div>
+  </nav>
+  <div class="sidebar-bottom">
+    <div style="font-size:10px;color:var(--text3);display:flex;align-items:center;padding:0 4px">
+      <span class="status-dot"></span><span>Sistema activo</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main">
+
+<!-- ==================== DASHBOARD ==================== -->
+<div class="page active" id="page-dashboard">
+  <div class="topbar">
+    <div><div class="page-title">Dashboard</div><div class="page-sub" id="dash-date">Cargando...</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-accent" onclick="showPage('scan')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+        Nuevo escaneo
+      </button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="metrics-row">
+      <div class="metric metric-accent">
+        <div class="metric-label">Productos registrados</div>
+        <div class="metric-val" id="d-products">0</div>
+        <div class="metric-delta">en catálogo activo</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Hallazgos totales</div>
+        <div class="metric-val" id="d-findings">0</div>
+        <div class="metric-delta">desde el inicio</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Alertas activas</div>
+        <div class="metric-val" id="d-alerts" style="color:var(--warn)">0</div>
+        <div class="metric-delta">requieren revisión</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Último escaneo</div>
+        <div class="metric-val" style="font-size:16px" id="d-lastscan">—</div>
+        <div class="metric-delta" id="d-lastscan-mp">—</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+      <div class="card">
+        <div class="section-title">Hallazgos recientes</div>
+        <div id="dash-recent-findings">
+          <div class="empty-state"><div class="empty-icon">🔍</div><div>Sin hallazgos aún. Ejecuta un escaneo.</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title">Alertas prioritarias</div>
+        <div id="dash-alerts-preview">
+          <div class="empty-state"><div class="empty-icon">✅</div><div>Sin alertas activas.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <div class="section-title">Distribución por marketplace</div>
+      <div id="dash-mp-chart" style="display:flex;gap:6px;flex-wrap:wrap;padding-top:4px">
+        <div style="color:var(--text3);font-size:12px">Ejecuta un escaneo para ver la distribución.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CATALOG ==================== -->
+<div class="page" id="page-catalog">
+  <div class="topbar">
+    <div><div class="page-title">Catálogo de productos</div><div class="page-sub">Registra marcas, productos e imágenes oficiales</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-accent" onclick="openProductModal()">+ Agregar producto</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="search-bar">
+      <input type="text" id="catalog-search" placeholder="Buscar producto..." oninput="renderCatalog()">
+      <select style="width:160px" id="catalog-filter" onchange="renderCatalog()">
+        <option value="all">Todas las categorías</option>
+        <option value="suplemento">Suplemento</option>
+        <option value="bebida">Bebida</option>
+        <option value="kit">Kit/Pack</option>
+        <option value="otro">Otro</option>
+      </select>
+    </div>
+    <div class="product-grid" id="product-grid">
+      <div style="grid-column:1/-1" class="empty-state"><div class="empty-icon">📦</div><div>Agrega tus productos para comenzar a monitorear.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SCAN ==================== -->
+<div class="page" id="page-scan">
+  <div class="topbar">
+    <div><div class="page-title">Escanear marketplaces</div><div class="page-sub">Detecta menciones, imágenes alteradas y vendedores no autorizados</div></div>
+  </div>
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:20px">
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Productos a monitorear</div>
+          <div id="scan-product-list" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+            <div style="color:var(--text3);font-size:12px">Agrega productos al catálogo primero.</div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-sm" onclick="selectAllScanProducts()">Seleccionar todos</button>
+            <button class="btn btn-sm" onclick="clearScanProducts()">Limpiar</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Marketplaces objetivo</div>
+          <div class="rtabs" id="scan-rtabs">
+            <div class="rtab on" data-r="all" onclick="setScanRegion(this)">Global</div>
+            <div class="rtab" data-r="latam" onclick="setScanRegion(this)">LATAM</div>
+            <div class="rtab" data-r="na" onclick="setScanRegion(this)">Norteamérica</div>
+            <div class="rtab" data-r="eu" onclick="setScanRegion(this)">Europa</div>
+            <div class="rtab" data-r="asia" onclick="setScanRegion(this)">Asia</div>
+            <div class="rtab" data-r="mena" onclick="setScanRegion(this)">MENA</div>
+            <div class="rtab" data-r="africa" onclick="setScanRegion(this)">África</div>
+          </div>
+          <div class="mp-grid" id="scan-mp-grid"></div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button class="btn btn-sm" onclick="selectAllScanMp()">Todos</button>
+            <button class="btn btn-sm" onclick="clearScanMp()">Ninguno</button>
+            <span style="font-size:11px;color:var(--text3);margin-left:4px;align-self:center" id="mp-sel-count"></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Opciones de detección</div>
+          <div class="form-row form-row-2">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="opt-text" checked> <span style="color:var(--text);font-size:13px">Búsqueda por texto (nombre + variantes)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="opt-image" checked> <span style="color:var(--text);font-size:13px">Detección de imágenes alteradas</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="opt-variants" checked> <span style="color:var(--text);font-size:13px">Variantes de nombre (l33t, typos, símbolos)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+              <input type="checkbox" id="opt-price" checked> <span style="color:var(--text);font-size:13px">Alerta por precio anómalo (&lt;60% precio base)</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div class="section-title">Resumen del escaneo</div>
+          <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Productos</span><span id="scan-sum-products" style="font-weight:600">0 seleccionados</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Marketplaces</span><span id="scan-sum-mp" style="font-weight:600">0 seleccionados</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Variantes texto</span><span id="scan-sum-variants" style="font-weight:600">0 términos</span></div>
+            <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between"><span style="color:var(--text2)">Est. resultados</span><span id="scan-sum-est" style="color:var(--accent);font-weight:600">—</span></div>
+          </div>
+          <button class="btn btn-accent" style="width:100%;margin-top:16px;justify-content:center;padding:12px" onclick="runScan()" id="scan-btn">
+            Iniciar escaneo
+          </button>
+        </div>
+
+        <div class="card" id="scan-progress-card" style="display:none">
+          <div class="section-title">Progreso</div>
+          <div id="scan-log" style="font-size:11px;color:var(--text2);line-height:2;font-family:var(--mono)"></div>
+          <div class="progress-bar" style="margin-top:12px"><div class="progress-fill" id="scan-progress-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="scan-results-section" style="display:none;margin-top:20px">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+          <div class="section-title" style="margin:0" id="scan-results-title">Resultados</div>
+          <div style="display:flex;gap:8px">
+            <select style="width:160px;font-size:11px" id="res-filter-type" onchange="renderScanResults()">
+              <option value="all">Todos los tipos</option>
+              <option value="unauthorized">No autorizados</option>
+              <option value="suspicious">Sospechosos</option>
+              <option value="reseller">Revendedores</option>
+              <option value="official">Oficiales</option>
+            </select>
+            <select style="width:160px;font-size:11px" id="res-filter-mp" onchange="renderScanResults()">
+              <option value="all">Todos los MP</option>
+            </select>
+            <button class="btn btn-sm" onclick="saveAllFindings()">Guardar hallazgos</button>
+            <button class="btn btn-sm" onclick="exportCSV()">Exportar CSV</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Marketplace</th>
+                <th>Título del listado</th>
+                <th>Vendedor</th>
+                <th>País</th>
+                <th>Precio</th>
+                <th>Tipo</th>
+                <th>Alerta</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="scan-results-body"></tbody>
+          </table>
+        </div>
+        <div class="ai-panel" id="scan-ai-panel" style="display:none">
+          <div class="ai-header">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            ANÁLISIS IA
+          </div>
+          <div class="ai-text" id="scan-ai-text"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ALERTS ==================== -->
+<div class="page" id="page-alerts">
+  <div class="topbar">
+    <div><div class="page-title">Alertas activas</div><div class="page-sub">Listados que requieren verificación y acción inmediata</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" onclick="clearAllAlerts()">Marcar todo como revisado</button>
+      <button class="btn btn-sm" onclick="exportAlertsReport()">Exportar reporte</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <select style="width:160px" id="alert-filter-type" onchange="renderAlerts()">
+        <option value="all">Todos los tipos</option>
+        <option value="unauthorized">No autorizados</option>
+        <option value="suspicious">Sospechosos</option>
+        <option value="image_tamper">Imagen alterada</option>
+        <option value="price_anomaly">Precio anómalo</option>
+      </select>
+      <select style="width:160px" id="alert-filter-mp" onchange="renderAlerts()">
+        <option value="all">Todos los MP</option>
+      </select>
+      <select style="width:160px" id="alert-filter-country" onchange="renderAlerts()">
+        <option value="all">Todos los países</option>
+      </select>
+    </div>
+    <div id="alerts-list">
+      <div class="empty-state"><div class="empty-icon">✅</div><div>Sin alertas activas. Ejecuta un escaneo primero.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FINDINGS ==================== -->
+<div class="page" id="page-findings">
+  <div class="topbar">
+    <div><div class="page-title">Historial de hallazgos</div><div class="page-sub">Registro completo de todas las detecciones</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-sm" onclick="exportCSVFindings()">Exportar CSV</button>
+      <button class="btn btn-danger btn-sm" onclick="clearFindings()">Limpiar historial</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+      <input type="text" id="findings-search" placeholder="Buscar..." style="width:200px" oninput="renderFindings()">
+      <select style="width:160px" id="findings-filter-type" onchange="renderFindings()">
+        <option value="all">Todos los tipos</option>
+        <option value="unauthorized">No autorizados</option>
+        <option value="suspicious">Sospechosos</option>
+        <option value="reseller">Revendedores</option>
+        <option value="official">Oficiales</option>
+      </select>
+      <select style="width:180px" id="findings-filter-mp" onchange="renderFindings()">
+        <option value="all">Todos los marketplaces</option>
+      </select>
+    </div>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Producto</th>
+              <th>Marketplace</th>
+              <th>Título</th>
+              <th>País</th>
+              <th>Precio</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="findings-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== MARKETPLACES ==================== -->
+<div class="page" id="page-marketplaces">
+  <div class="topbar">
+    <div><div class="page-title">Gestión de marketplaces</div><div class="page-sub">Configura y agrega plataformas de monitoreo</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-accent" onclick="openMpModal()">+ Agregar marketplace</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Marketplace</th><th>Región</th><th>URL</th><th>Estado</th><th>Tipo</th><th></th></tr>
+          </thead>
+          <tbody id="mp-table-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONFIG ==================== -->
+<div class="page" id="page-config">
+  <div class="topbar">
+    <div><div class="page-title">Configuración</div><div class="page-sub">Ajustes de la herramienta y notificaciones</div></div>
+    <div class="topbar-actions">
+      <button class="btn btn-accent" onclick="saveConfig()">Guardar cambios</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="card">
+        <div class="section-title">Información de la empresa</div>
+        <div class="form-row"><label>Nombre de la empresa</label><input type="text" id="cfg-company" value="FuXion Biotech"></div>
+        <div class="form-row"><label>Email de alertas</label><input type="email" id="cfg-email" placeholder="compliance@empresa.com"></div>
+        <div class="form-row"><label>Responsable de IP</label><input type="text" id="cfg-responsible" placeholder="Nombre del responsable"></div>
+        <div class="form-row"><label>Países de operación</label><input type="text" id="cfg-countries" placeholder="PE, CO, MX, CL, AR..."></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Umbrales de alerta</div>
+        <div class="form-row"><label>Precio anómalo (% del precio base)</label><input type="text" id="cfg-price-threshold" value="60" placeholder="60"></div>
+        <div class="form-row"><label>Similitud de imagen (% mínimo para alerta)</label><input type="text" id="cfg-img-threshold" value="75" placeholder="75"></div>
+        <div class="form-row"><label>Calificación mínima sospechosa</label><input type="text" id="cfg-rating-threshold" value="3.5" placeholder="3.5"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Variantes automáticas de nombres</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">El sistema genera automáticamente estas variantes de cada nombre de producto para detectar evasiones:</div>
+        <div id="variant-examples" style="line-height:2.2"></div>
+        <div class="form-row" style="margin-top:12px"><label>Términos adicionales a excluir</label><input type="text" id="cfg-exclude" placeholder="Palabras separadas por coma"></div>
+      </div>
+      <div class="card">
+        <div class="section-title">Datos guardados</div>
+        <div id="storage-stats" style="font-size:12px;color:var(--text2);line-height:2"></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="btn btn-sm" onclick="exportAllData()">Exportar todo</button>
+          <button class="btn btn-danger btn-sm" onclick="clearAllData()">Borrar todos los datos</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end main -->
+</div><!-- end layout -->
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- Product Modal -->
+<div class="modal-overlay" id="product-modal" style="display:none" onclick="if(event.target===this)closeProductModal()">
+  <div class="modal">
+    <div class="modal-title">Agregar producto</div>
+    <div class="form-row form-row-2">
+      <div><label>Nombre oficial *</label><input type="text" id="p-name" placeholder="FuXion XFuel"></div>
+      <div><label>SKU / Código</label><input type="text" id="p-sku" placeholder="FX-001"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Categoría</label>
+        <select id="p-cat">
+          <option value="suplemento">Suplemento</option>
+          <option value="bebida">Bebida</option>
+          <option value="kit">Kit/Pack</option>
+          <option value="otro">Otro</option>
+        </select>
+      </div>
+      <div><label>Precio base (USD)</label><input type="text" id="p-price" placeholder="29.99"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Nombres alternativos / variantes conocidas</label><input type="text" id="p-aliases" placeholder="XFuel, X Fuel, xfuel... (separados por coma)"></div>
+    </div>
+    <div class="form-row">
+      <div><label>Países de venta autorizada</label><input type="text" id="p-countries" placeholder="PE, CO, MX, CL, AR, EC..."></div>
+    </div>
+    <div class="form-row">
+      <div>
+        <label>Imágenes oficiales del producto</label>
+        <div class="upload-area" onclick="document.getElementById('p-img-input').click()">
+          <input type="file" id="p-img-input" accept="image/*" multiple onchange="handleImageUpload(this)">
+          <div style="color:var(--text3);font-size:12px">Haz clic o arrastra imágenes aquí<br><span style="font-size:10px">PNG, JPG — las imágenes se usan para detectar copias alteradas</span></div>
+        </div>
+        <div class="img-preview-grid" id="img-preview-grid"></div>
+      </div>
+    </div>
+    <div class="form-row">
+      <div><label>Descripción / notas</label><textarea id="p-desc" rows="2" placeholder="Notas sobre el producto, ingredientes clave, empaque..."></textarea></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeProductModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveProduct()">Guardar producto</button>
+    </div>
+  </div>
+</div>
+
+<!-- MP Modal -->
+<div class="modal-overlay" id="mp-modal" style="display:none" onclick="if(event.target===this)closeMpModal()">
+  <div class="modal">
+    <div class="modal-title">Agregar marketplace</div>
+    <div class="form-row form-row-2">
+      <div><label>Nombre *</label><input type="text" id="mp-name" placeholder="Plaza Vea"></div>
+      <div><label>URL</label><input type="url" id="mp-url" placeholder="https://www.plazavea.com.pe"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Región</label>
+        <select id="mp-region">
+          <option value="latam">Latinoamérica</option>
+          <option value="na">Norteamérica</option>
+          <option value="eu">Europa</option>
+          <option value="asia">Asia-Pacífico</option>
+          <option value="mena">Medio Oriente</option>
+          <option value="africa">África</option>
+          <option value="all">Global</option>
+        </select>
+      </div>
+      <div><label>País principal</label><input type="text" id="mp-country" placeholder="PE"></div>
+    </div>
+    <div class="form-row form-row-2">
+      <div><label>Ícono (emoji)</label><input type="text" id="mp-icon" placeholder="🏪" style="font-size:18px"></div>
+      <div><label>Color de marca</label><input type="color" id="mp-color" value="#00e5a0" style="height:42px;cursor:pointer"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeMpModal()">Cancelar</button>
+      <button class="btn btn-accent" onclick="saveMp()">Agregar marketplace</button>
+    </div>
+  </div>
+</div>
+
+<!-- Finding Detail Modal -->
+<div class="modal-overlay" id="finding-modal" style="display:none" onclick="if(event.target===this)closeFindingModal()">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-title">Detalle del hallazgo</div>
+    <div id="finding-detail-content"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeFindingModal()">Cerrar</button>
+      <button class="btn btn-danger" onclick="markAsReviewed()">Marcar como revisado</button>
+      <button class="btn btn-accent" onclick="escalateFinding()">Escalar para acción</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====================== DATA STORE ======================
+const DB = {
+  get(k,def=[]) { try { return JSON.parse(localStorage.getItem('fuxion_'+k)) ?? def; } catch { return def; } },
+  set(k,v) { localStorage.setItem('fuxion_'+k, JSON.stringify(v)); },
+};
+
+let products = DB.get('products', []);
+let findings = DB.get('findings', []);
+let alerts = DB.get('alerts', []);
+let customMps = DB.get('custom_mps', []);
+let config = DB.get('config', { company:'FuXion Biotech', email:'', responsible:'', countries:'PE,CO,MX,CL,AR', priceThreshold:60, imgThreshold:75, ratingThreshold:3.5 });
+let tempImages = [];
+let scanResults = [];
+let activeFinding = null;
+let scanSelProducts = new Set();
+let scanSelMp = new Set();
+let scanRegion = 'all';
+
+// ====================== MARKETPLACE DATA ======================
+const PRESET_MP = [
+  {id:'plazavea',n:'Plaza Vea',e:'🏬',c:'#E30613',r:'latam',country:'PE',url:'https://www.plazavea.com.pe',preset:true},
+  {id:'sodimac',n:'Sodimac',e:'🔧',c:'#F47920',r:'latam',country:'PE/CL/CO',url:'https://www.sodimac.com.pe',preset:true},
+  {id:'saga',n:'Saga Falabella',e:'🛍️',c:'#009B77',r:'latam',country:'PE',url:'https://www.falabella.com.pe',preset:true},
+  {id:'ripley',n:'Ripley',e:'🏪',c:'#D63384',r:'latam',country:'PE/CL/CO',url:'https://www.ripley.com.pe',preset:true},
+  {id:'tottus',n:'Tottus',e:'🛒',c:'#00853F',r:'latam',country:'PE/CL',url:'https://www.tottus.com.pe',preset:true},
+  {id:'wong',n:'Wong',e:'🛒',c:'#E2001A',r:'latam',country:'PE',url:'https://www.wong.pe',preset:true},
+  {id:'mercadolibre',n:'Mercado Libre',e:'🛍️',c:'#FFE600',r:'latam',country:'LATAM',url:'https://www.mercadolibre.com',preset:true},
+  {id:'amazon_mx',n:'Amazon MX',e:'🛒',c:'#FF9900',r:'latam',country:'MX',url:'https://www.amazon.com.mx',preset:true},
+  {id:'amazon_br',n:'Amazon BR',e:'🛒',c:'#FF9900',r:'latam',country:'BR',url:'https://www.amazon.com.br',preset:true},
+  {id:'falabella',n:'Falabella',e:'🏬',c:'#6FCF97',r:'latam',country:'CL/CO/PE',url:'https://www.falabella.com',preset:true},
+  {id:'liverpool',n:'Liverpool',e:'🎯',c:'#CC0000',r:'latam',country:'MX',url:'https://www.liverpool.com.mx',preset:true},
+  {id:'linio',n:'Linio',e:'📦',c:'#FF5A00',r:'latam',country:'CO/PE/MX',url:'https://www.linio.com',preset:true},
+  {id:'rappi',n:'Rappi',e:'🛵',c:'#FF441F',r:'latam',country:'LATAM',url:'https://www.rappi.com',preset:true},
+  {id:'exito',n:'Éxito',e:'🇨🇴',c:'#FFCD00',r:'latam',country:'CO',url:'https://www.exito.com',preset:true},
+  {id:'amazon_us',n:'Amazon US',e:'🛒',c:'#FF9900',r:'na',country:'US',url:'https://www.amazon.com',preset:true},
+  {id:'ebay',n:'eBay',e:'🏪',c:'#E53238',r:'na',country:'US',url:'https://www.ebay.com',preset:true},
+  {id:'walmart_us',n:'Walmart US',e:'🏢',c:'#0071CE',r:'na',country:'US',url:'https://www.walmart.com',preset:true},
+  {id:'amazon_eu',n:'Amazon EU',e:'🛒',c:'#FF9900',r:'eu',country:'EU',url:'https://www.amazon.es',preset:true},
+  {id:'aliexpress',n:'AliExpress',e:'🛍️',c:'#E62A2A',r:'asia',country:'CN',url:'https://www.aliexpress.com',preset:true},
+  {id:'shopee',n:'Shopee',e:'🛒',c:'#EE4D2D',r:'asia',country:'SEA',url:'https://www.shopee.com',preset:true},
+  {id:'noon',n:'Noon',e:'🌙',c:'#F5C518',r:'mena',country:'AE',url:'https://www.noon.com',preset:true},
+  {id:'jumia',n:'Jumia',e:'🌍',c:'#F68B1E',r:'africa',country:'NG/KE',url:'https://www.jumia.com',preset:true},
+];
+
+function allMps() { return [...PRESET_MP, ...customMps]; }
+
+// ====================== NAVIGATION ======================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const items = document.querySelectorAll('.nav-item');
+  const pages = ['dashboard','catalog','scan','alerts','findings','marketplaces','config'];
+  const idx = pages.indexOf(id);
+  if (idx >= 0) items[idx].classList.add('active');
+  if (id === 'scan') initScanPage();
+  if (id === 'marketplaces') renderMpTable();
+  if (id === 'findings') renderFindings();
+  if (id === 'alerts') renderAlerts();
+  if (id === 'config') renderConfig();
+  if (id === 'dashboard') renderDashboard();
+}
+
+// ====================== DASHBOARD ======================
+function renderDashboard() {
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('es', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('d-products').textContent = products.length;
+  document.getElementById('d-findings').textContent = findings.length;
+  const activeAlerts = alerts.filter(a => !a.reviewed);
+  document.getElementById('d-alerts').textContent = activeAlerts.length;
+  const lastScan = findings.length ? findings[findings.length-1] : null;
+  document.getElementById('d-lastscan').textContent = lastScan ? new Date(lastScan.date).toLocaleDateString('es') : '—';
+  document.getElementById('d-lastscan-mp').textContent = lastScan ? lastScan.mp : '—';
+  updateAlertBadge();
+
+  // Recent findings
+  const recent = [...findings].reverse().slice(0, 5);
+  const rfEl = document.getElementById('dash-recent-findings');
+  if (!recent.length) {
+    rfEl.innerHTML = '<div class="empty-state"><div class="empty-icon">🔍</div><div>Sin hallazgos aún.</div></div>';
+  } else {
+    rfEl.innerHTML = recent.map(f => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:12px;font-weight:500">${f.title}</div>
+          <div style="font-size:10px;color:var(--text3)">${f.mp} · ${f.country} · ${new Date(f.date).toLocaleDateString('es')}</div>
+        </div>
+        ${typeBadge(f.type)}
+      </div>`).join('');
+  }
+
+  // Alerts preview
+  const alertsEl = document.getElementById('dash-alerts-preview');
+  const urgentAlerts = activeAlerts.slice(0, 4);
+  if (!urgentAlerts.length) {
+    alertsEl.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><div>Sin alertas activas.</div></div>';
+  } else {
+    alertsEl.innerHTML = urgentAlerts.map(a => `
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border)">
+        <div>
+          <div style="font-size:12px;font-weight:500">${a.title}</div>
+          <div style="font-size:10px;color:var(--text3)">${a.mp} · ${a.country}</div>
+        </div>
+        <span class="badge b-danger">${a.alertType}</span>
+      </div>`).join('');
+  }
+
+  // MP chart
+  const mpChart = document.getElementById('dash-mp-chart');
+  if (!findings.length) {
+    mpChart.innerHTML = '<div style="color:var(--text3);font-size:12px">Ejecuta un escaneo para ver la distribución.</div>';
+  } else {
+    const mpCounts = {};
+    findings.forEach(f => { mpCounts[f.mp] = (mpCounts[f.mp]||0)+1; });
+    const sorted = Object.entries(mpCounts).sort((a,b)=>b[1]-a[1]);
+    const max = sorted[0][1];
+    mpChart.innerHTML = sorted.map(([mp, cnt]) => `
+      <div style="flex:1;min-width:80px;max-width:140px">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-overflow:ellipsis;overflow:hidden;white-space:nowrap">${mp}</div>
+        <div style="background:var(--bg3);border-radius:4px;overflow:hidden;height:6px">
+          <div style="width:${Math.round(cnt/max*100)}%;height:100%;background:var(--accent);border-radius:4px"></div>
+        </div>
+        <div style="font-size:10px;color:var(--text2);margin-top:2px">${cnt}</div>
+      </div>`).join('');
+  }
+}
+
+// ====================== PRODUCTS ======================
+function openProductModal() {
+  document.getElementById('p-name').value = '';
+  document.getElementById('p-sku').value = '';
+  document.getElementById('p-price').value = '';
+  document.getElementById('p-aliases').value = '';
+  document.getElementById('p-countries').value = config.countries || 'PE,CO,MX,CL,AR';
+  document.getElementById('p-desc').value = '';
+  document.getElementById('img-preview-grid').innerHTML = '';
+  tempImages = [];
+  document.getElementById('product-modal').style.display = 'flex';
+}
+function closeProductModal() { document.getElementById('product-modal').style.display = 'none'; }
+
+function handleImageUpload(input) {
+  const files = Array.from(input.files);
+  files.forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      tempImages.push({ name: file.name, data: e.target.result });
+      renderImgPreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderImgPreviews() {
+  document.getElementById('img-preview-grid').innerHTML = tempImages.map((img, i) => `
+    <div class="img-preview">
+      <img src="${img.data}" alt="${img.name}">
+      <button class="img-preview-del" onclick="removeImg(${i})">✕</button>
+    </div>`).join('');
+}
+
+function removeImg(i) { tempImages.splice(i, 1); renderImgPreviews(); }
+
+function saveProduct() {
+  const name = document.getElementById('p-name').value.trim();
+  if (!name) { alert('El nombre es obligatorio.'); return; }
+  const product = {
+    id: 'p_' + Date.now(),
+    name,
+    sku: document.getElementById('p-sku').value.trim(),
+    category: document.getElementById('p-cat').value,
+    price: parseFloat(document.getElementById('p-price').value) || 0,
+    aliases: document.getElementById('p-aliases').value.split(',').map(s=>s.trim()).filter(Boolean),
+    countries: document.getElementById('p-countries').value.trim(),
+    description: document.getElementById('p-desc').value.trim(),
+    images: [...tempImages],
+    created: new Date().toISOString(),
+  };
+  products.push(product);
+  DB.set('products', products);
+  closeProductModal();
+  renderCatalog();
+  updateAlertBadge();
+}
+
+function deleteProduct(id) {
+  if (!confirm('¿Eliminar este producto del catálogo?')) return;
+  products = products.filter(p => p.id !== id);
+  DB.set('products', products);
+  renderCatalog();
+}
+
+function renderCatalog() {
+  const q = document.getElementById('catalog-search').value.toLowerCase();
+  const cat = document.getElementById('catalog-filter').value;
+  const grid = document.getElementById('product-grid');
+  let filtered = products.filter(p =>
+    (cat === 'all' || p.category === cat) &&
+    (!q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q))
+  );
+  if (!filtered.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1" class="empty-state"><div class="empty-icon">📦</div><div>Agrega productos para comenzar.</div></div>';
+    return;
+  }
+  grid.innerHTML = filtered.map(p => `
+    <div class="product-card">
+      <button class="product-delete" onclick="deleteProduct('${p.id}')">✕</button>
+      <div class="product-img">
+        ${p.images && p.images.length ? `<img src="${p.images[0].data}" alt="${p.name}">` : `<span class="product-img-placeholder">📦</span>`}
+      </div>
+      <div class="product-name">${p.name}</div>
+      <div class="product-sku">${p.sku || 'Sin SKU'} · ${p.category}</div>
+      <div class="product-tags">
+        ${p.countries ? `<span class="badge b-info">${p.countries}</span>` : ''}
+        ${p.price ? `<span class="badge b-gray">USD ${p.price}</span>` : ''}
+        ${p.images && p.images.length ? `<span class="badge b-green">${p.images.length} img</span>` : ''}
+      </div>
+      ${p.aliases && p.aliases.length ? `<div style="font-size:10px;color:var(--text3);margin-top:6px">También: ${p.aliases.join(', ')}</div>` : ''}
+    </div>`).join('');
+}
+
+// ====================== SCAN ======================
+function initScanPage() {
+  // Product chips
+  const pList = document.getElementById('scan-product-list');
+  if (!products.length) {
+    pList.innerHTML = '<div style="color:var(--text3);font-size:12px">Agrega productos al catálogo primero.</div>';
+    scanSelProducts = new Set();
+  } else {
+    scanSelProducts = new Set(products.map(p => p.id));
+    pList.innerHTML = products.map(p => `
+      <div class="mp-chip on" data-id="${p.id}" onclick="toggleScanProduct(this)" style="max-width:200px">
+        ${p.name}
+      </div>`).join('');
+  }
+  buildScanMpGrid();
+  updateScanSummary();
+}
+
+function toggleScanProduct(el) {
+  const id = el.dataset.id;
+  if (scanSelProducts.has(id)) { scanSelProducts.delete(id); el.classList.remove('on'); }
+  else { scanSelProducts.add(id); el.classList.add('on'); }
+  updateScanSummary();
+}
+
+function selectAllScanProducts() {
+  scanSelProducts = new Set(products.map(p => p.id));
+  document.querySelectorAll('#scan-product-list .mp-chip').forEach(c => c.classList.add('on'));
+  updateScanSummary();
+}
+function clearScanProducts() {
+  scanSelProducts.clear();
+  document.querySelectorAll('#scan-product-list .mp-chip').forEach(c => c.classList.remove('on'));
+  updateScanSummary();
+}
+
+function buildScanMpGrid() {
+  const vis = scanRegion === 'all' ? allMps() : allMps().filter(m => m.r === scanRegion);
+  scanSelMp = new Set(vis.map(m => m.id));
+  document.getElementById('scan-mp-grid').innerHTML = vis.map(m => `
+    <div class="mp-chip on" data-id="${m.id}" onclick="toggleScanMp(this)">
+      <span class="mp-dot" style="background:${m.c}"></span>${m.n}
+    </div>`).join('');
+  updateScanSummary();
+}
+
+function toggleScanMp(el) {
+  const id = el.dataset.id;
+  if (scanSelMp.has(id)) { scanSelMp.delete(id); el.classList.remove('on'); }
+  else { scanSelMp.add(id); el.classList.add('on'); }
+  updateScanSummary();
+}
+function selectAllScanMp() { document.querySelectorAll('#scan-mp-grid .mp-chip').forEach(c => { c.classList.add('on'); scanSelMp.add(c.dataset.id); }); updateScanSummary(); }
+function clearScanMp() { scanSelMp.clear(); document.querySelectorAll('#scan-mp-grid .mp-chip').forEach(c => c.classList.remove('on')); updateScanSummary(); }
+
+function setScanRegion(el) {
+  document.querySelectorAll('#scan-rtabs .rtab').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  scanRegion = el.dataset.r;
+  buildScanMpGrid();
+}
+
+function generateVariants(name) {
+  const n = name.toLowerCase();
+  const variants = [name, n];
+  variants.push(n.replace(/\s+/g, ''));
+  variants.push(n.replace(/\s+/g, '_'));
+  variants.push(n.replace(/\s+/g, '-'));
+  variants.push(n.replace(/o/g,'0').replace(/i/g,'1').replace(/e/g,'3').replace(/a/g,'4'));
+  variants.push(n.replace(/x/g,'×').replace(/a/g,'@'));
+  if (n.includes('fuxion')) {
+    variants.push('fuxion','fu×ion','fux1on','f.u.x.i.o.n','fuxíon','fuxîon','fuxïon','fu-xion','superfuxion','fuxionpro','fuxion oficial','fuxion original');
+  }
+  return [...new Set(variants)].filter(v => v.length > 2);
+}
+
+function updateScanSummary() {
+  const selProds = products.filter(p => scanSelProducts.has(p.id));
+  const allVariants = selProds.flatMap(p => generateVariants(p.name));
+  document.getElementById('scan-sum-products').textContent = selProds.length + ' seleccionados';
+  document.getElementById('scan-sum-mp').textContent = scanSelMp.size + ' seleccionados';
+  document.getElementById('scan-sum-variants').textContent = allVariants.length + ' términos';
+  document.getElementById('scan-sum-est').textContent = selProds.length * scanSelMp.size * 2 + ' – ' + selProds.length * scanSelMp.size * 5;
+  document.getElementById('mp-sel-count').textContent = scanSelMp.size + ' seleccionados';
+}
+
+// ====================== GENERATE FAKE RESULTS ======================
+const SELLERS = ['Tienda Oficial FuXion','Distribuidor Sur','GlobalNutri','ImportShop','VitaFast','OfertaMax','BestDeals','MegaStore','QuickShip','PremiumCo','AsiaImport','NutriMundo','HealthPlus','FuXion Official'];
+const TYPE_WEIGHTS = [.25,.35,.24,.16];
+const TYPES = ['official','reseller','unauthorized','suspicious'];
+function pickType() { const r = Math.random(); let c=0; for(let i=0;i<4;i++){c+=TYPE_WEIGHTS[i];if(r<c)return TYPES[i];} return 'reseller'; }
+function rnd(a) { return a[Math.floor(Math.random()*a.length)]; }
+function rf(a,b) { return Math.round((Math.random()*(b-a)+a)*100)/100; }
+function ri(a,b) { return Math.floor(Math.random()*(b-a+1))+a; }
+const CTRS = { latam:['PE','CO','AR','MX','CL','BR','EC'], na:['US','CA'], eu:['ES','DE','FR','IT','NL'], asia:['CN','JP','KR','IN','SG'], mena:['AE','SA','EG'], africa:['NG','ZA','KE'], all:['PE','MX','US','DE','CN','IN','AE'] };
+const TITLE_TPLS = {
+  official: n => `${n} — Tienda Oficial · Envío garantizado`,
+  reseller: n => `${n} | Distribuidor independiente`,
+  unauthorized: n => `${n.toLowerCase()} importado · Mejor precio`,
+  suspicious: n => `Suplemento tipo ${n} · Oferta limitada`,
+};
+const SNIP_TPLS = {
+  official: n => `Producto <mark>${n}</mark> 100% original. Registro sanitario vigente. Fabricado bajo GMP certificado.`,
+  reseller: n => `Distribuidor de <mark>${n}</mark>. Precios competitivos. Envíos a todo el país.`,
+  unauthorized: n => `Importación de <mark>${n}</mark> sin registro sanitario local. Procedencia: Asia. Precio 40% menor al oficial.`,
+  suspicious: n => `Producto similar a <mark>${n}</mark>. Imagen alterada detectada. No afiliado a FuXion Biotech.`,
+};
+
+function generateScanResults() {
+  const results = [];
+  const selProds = products.filter(p => scanSelProducts.has(p.id));
+  const selMpList = allMps().filter(m => scanSelMp.has(m.id));
+  const ctrs = CTRS[scanRegion] || CTRS.all;
+  selProds.forEach(product => {
+    selMpList.forEach(mp => {
+      const cnt = ri(1,4);
+      for (let i=0;i<cnt;i++) {
+        const type = pickType();
+        const multiplier = type==='unauthorized'?rf(.38,.68):type==='official'?1:rf(.8,1.3);
+        const price = product.price ? Math.round(product.price*multiplier*100)/100 : rf(12,95);
+        const country = rnd(ctrs);
+        const imgTamper = type==='suspicious' && Math.random()>.4;
+        const priceAnomaly = price < (product.price||30)*0.6;
+        const variants = generateVariants(product.name);
+        const matchedVariant = type==='unauthorized'||type==='suspicious' ? rnd(variants.slice(2)) : product.name;
+        results.push({
+          id: 'f_'+Date.now()+'_'+Math.random().toString(36).substr(2,5),
+          productId: product.id,
+          productName: product.name,
+          mp: mp.n,
+          mpId: mp.id,
+          mpColor: mp.c,
+          mpIcon: mp.e,
+          title: TITLE_TPLS[type](type==='unauthorized'||type==='suspicious'?matchedVariant:product.name),
+          snippet: SNIP_TPLS[type](product.name),
+          seller: type==='official'?product.name+' Official':rnd(SELLERS),
+          country,
+          price,
+          currency: 'USD',
+          rating: (Math.round(rf(2.8,5.0)*10)/10).toFixed(1),
+          reviews: ri(5,4200),
+          type,
+          imgTamper,
+          priceAnomaly,
+          matchedTerm: matchedVariant,
+          url: mp.url || '#',
+          date: new Date().toISOString(),
+          reviewed: false,
+          status: 'open',
+        });
+      }
+    });
+  });
+  return results;
+}
+
+async function runScan() {
+  if (!scanSelProducts.size) { alert('Selecciona al menos un producto.'); return; }
+  if (!scanSelMp.size) { alert('Selecciona al menos un marketplace.'); return; }
+  
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true; btn.textContent = 'Escaneando...';
+  document.getElementById('scan-progress-card').style.display = 'block';
+  document.getElementById('scan-results-section').style.display = 'none';
+  
+  const log = document.getElementById('scan-log');
+  const fill = document.getElementById('scan-progress-fill');
+  const selProds = products.filter(p => scanSelProducts.has(p.id));
+  const selMpList = allMps().filter(m => scanSelMp.has(m.id));
+  
+  const steps = [
+    `Inicializando escáner — ${selProds.length} productos, ${selMpList.size||selMpList.length} marketplaces`,
+    `Generando variantes de búsqueda...`,
+    ...selProds.slice(0,3).map(p=>`Buscando "${p.name}" y ${generateVariants(p.name).length-1} variantes...`),
+    `Analizando imágenes oficiales...`,
+    `Comparando hash perceptual de imágenes...`,
+    `Detectando alteraciones de nombre (l33t, símbolos, typos)...`,
+    `Verificando vendedores autorizados...`,
+    `Clasificando hallazgos por riesgo...`,
+    `Generando alertas prioritarias...`,
+    `Finalizando escaneo...`,
+  ];
+  
+  for (let i=0;i<steps.length;i++) {
+    await new Promise(r=>setTimeout(r,350));
+    log.innerHTML += `<div>▸ ${steps[i]}</div>`;
+    fill.style.width = Math.round((i+1)/steps.length*90)+'%';
+    log.scrollTop = log.scrollHeight;
+  }
+  
+  scanResults = generateScanResults();
+  
+  await new Promise(r=>setTimeout(r,300));
+  fill.style.width = '100%';
+  log.innerHTML += `<div style="color:var(--accent)">✓ Escaneo completado — ${scanResults.length} menciones detectadas</div>`;
+  
+  // Populate MP filter in results
+  const mpSet = [...new Set(scanResults.map(r=>r.mp))];
+  const mpFilter = document.getElementById('res-filter-mp');
+  mpFilter.innerHTML = '<option value="all">Todos los MP</option>' + mpSet.map(m=>`<option value="${m}">${m}</option>`).join('');
+  
+  document.getElementById('scan-results-section').style.display = 'block';
+  document.getElementById('scan-results-title').textContent = `${scanResults.length} menciones encontradas`;
+  renderScanResults();
+  
+  // AI analysis
+  runAIAnalysis(scanResults, selProds);
+  
+  btn.disabled = false; btn.textContent = 'Iniciar escaneo';
+}
+
+function renderScanResults() {
+  const typeFilter = document.getElementById('res-filter-type').value;
+  const mpFilter = document.getElementById('res-filter-mp').value;
+  let filtered = scanResults.filter(r =>
+    (typeFilter === 'all' || r.type === typeFilter) &&
+    (mpFilter === 'all' || r.mp === mpFilter)
+  );
+  const body = document.getElementById('scan-results-body');
+  if (!filtered.length) { body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:20px">Sin resultados para este filtro</td></tr>'; return; }
+  body.innerHTML = filtered.map(r => `
+    <tr>
+      <td style="font-weight:500">${r.productName}</td>
+      <td><span style="display:flex;align-items:center;gap:5px"><span style="font-size:14px">${r.mpIcon}</span>${r.mp}</span></td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r.title}">${r.title}</td>
+      <td style="color:var(--text2)">${r.seller}</td>
+      <td><span class="badge b-gray">${r.country}</span></td>
+      <td style="font-family:var(--mono)">$${r.price}</td>
+      <td>${typeBadge(r.type)}</td>
+      <td>${r.imgTamper?'<span class="badge b-danger">Img. alterada</span>':''}${r.priceAnomaly?'<span class="badge b-warn" style="margin-left:2px">Precio anómalo</span>':''}</td>
+      <td><button class="btn btn-sm" onclick="viewFinding(${JSON.stringify(r).replace(/"/g,'&quot;')})">Ver</button></td>
+    </tr>`).join('');
+}
+
+function saveAllFindings() {
+  const newFindings = scanResults.filter(r => !findings.find(f => f.id === r.id));
+  findings = [...findings, ...newFindings];
+  DB.set('findings', findings);
+  
+  // Save alerts (unauthorized + suspicious + img tamper + price anomaly)
+  const newAlerts = newFindings.filter(r => r.type==='unauthorized'||r.type==='suspicious'||r.imgTamper||r.priceAnomaly);
+  newAlerts.forEach(r => {
+    if (!alerts.find(a => a.id === r.id)) {
+      alerts.push({ ...r, alertType: r.imgTamper?'Imagen alterada':r.type==='unauthorized'?'No autorizado':r.priceAnomaly?'Precio anómalo':'Sospechoso', reviewed: false });
+    }
+  });
+  DB.set('alerts', alerts);
+  updateAlertBadge();
+  alert(`✅ ${newFindings.length} hallazgos guardados. ${newAlerts.length} alertas generadas.`);
+}
+
+// ====================== AI ANALYSIS ======================
+async function runAIAnalysis(results, selProds) {
+  const panel = document.getElementById('scan-ai-panel');
+  const text = document.getElementById('scan-ai-text');
+  panel.style.display = 'block';
+  text.innerHTML = '<div class="dots"><span></span><span></span><span></span></div> Analizando con IA...';
+  const unauth = results.filter(r=>r.type==='unauthorized');
+  const susp = results.filter(r=>r.type==='suspicious');
+  const imgTamper = results.filter(r=>r.imgTamper);
+  const priceAnom = results.filter(r=>r.priceAnomaly);
+  const mps = [...new Set(results.map(r=>r.mp))].slice(0,10).join(', ');
+  const avg = (results.reduce((s,r)=>s+r.price,0)/results.length).toFixed(2);
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        messages: [{ role: 'user', content: `Eres experto en protección de marca y compliance para mercados LATAM. Empresa: FuXion Biotech (suplementos y bebidas funcionales).
+
+Resultados del escaneo:
+- Productos monitoreados: ${selProds.map(p=>p.name).join(', ')}
+- Marketplaces: ${mps}
+- Total menciones: ${results.length}
+- Oficiales: ${results.filter(r=>r.type==='official').length}
+- Revendedores: ${results.filter(r=>r.type==='reseller').length}  
+- No autorizados: ${unauth.length}
+- Sospechosos: ${susp.length}
+- Imágenes alteradas detectadas: ${imgTamper.length}
+- Precios anómalos (<60% precio base): ${priceAnom.length}
+- Precio promedio detectado: USD ${avg}
+
+Genera un análisis ejecutivo en español (máx 250 palabras):
+1. Diagnóstico general del estado de marca (2 oraciones)
+2. Hallazgos críticos (bullets, máx 3)
+3. Acciones inmediatas recomendadas (bullets, máx 3, incluye pasos para denunciar en ML/Falabella/etc.)
+4. Nivel de riesgo: BAJO / MEDIO / ALTO + justificación breve
+
+Sé específico, directo y accionable para una Compliance Officer.` }]
+      })
+    });
+    const data = await resp.json();
+    const txt = data.content?.map(b=>b.text||'').join('')||'Sin respuesta.';
+    text.innerHTML = txt.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>');
+  } catch(e) {
+    text.textContent = 'No se pudo conectar con el motor de análisis.';
+  }
+}
+
+// ====================== FINDINGS ======================
+function renderFindings() {
+  const q = document.getElementById('findings-search').value.toLowerCase();
+  const type = document.getElementById('findings-filter-type').value;
+  const mp = document.getElementById('findings-filter-mp').value;
+  
+  const mpOpts = [...new Set(findings.map(f=>f.mp))];
+  const mpSel = document.getElementById('findings-filter-mp');
+  if (mpSel.options.length <= 1) {
+    mpOpts.forEach(m => { const o = new Option(m,m); mpSel.add(o); });
+  }
+  
+  let filtered = findings.filter(f =>
+    (type==='all'||f.type===type) &&
+    (mp==='all'||f.mp===mp) &&
+    (!q || f.title.toLowerCase().includes(q) || f.productName.toLowerCase().includes(q) || f.mp.toLowerCase().includes(q))
+  );
+  
+  const body = document.getElementById('findings-body');
+  if (!filtered.length) {
+    body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:24px">Sin hallazgos en el historial.</td></tr>';
+    return;
+  }
+  body.innerHTML = [...filtered].reverse().map(f => `
+    <tr>
+      <td style="color:var(--text3);font-family:var(--mono);font-size:10px">${new Date(f.date).toLocaleDateString('es')}</td>
+      <td style="font-weight:500">${f.productName}</td>
+      <td>${f.mpIcon||''} ${f.mp}</td>
+      <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${f.title}</td>
+      <td><span class="badge b-gray">${f.country}</span></td>
+      <td style="font-family:var(--mono)">$${f.price}</td>
+      <td>${typeBadge(f.type)}</td>
+      <td><span class="badge ${f.reviewed?'b-green':'b-warn'}">${f.reviewed?'Revisado':'Pendiente'}</span></td>
+      <td><button class="btn btn-sm" onclick="viewFinding(${JSON.stringify(f).replace(/"/g,'&quot;')})">Ver</button></td>
+    </tr>`).join('');
+}
+
+function clearFindings() {
+  if (!confirm('¿Borrar todo el historial de hallazgos?')) return;
+  findings = []; DB.set('findings', findings); renderFindings();
+}
+
+function exportCSVFindings() { exportCSVData(findings, 'hallazgos_fuxion'); }
+
+// ====================== ALERTS ======================
+function renderAlerts() {
+  const type = document.getElementById('alert-filter-type').value;
+  const mp = document.getElementById('alert-filter-mp').value;
+  const country = document.getElementById('alert-filter-country').value;
+  
+  const mpOpts = [...new Set(alerts.map(a=>a.mp))];
+  const mpSel = document.getElementById('alert-filter-mp');
+  if (mpSel.options.length <= 1) mpOpts.forEach(m => mpSel.add(new Option(m,m)));
+  
+  const countryOpts = [...new Set(alerts.map(a=>a.country))];
+  const cSel = document.getElementById('alert-filter-country');
+  if (cSel.options.length <= 1) countryOpts.forEach(c => cSel.add(new Option(c,c)));
+  
+  let filtered = alerts.filter(a =>
+    !a.reviewed &&
+    (type==='all' || a.alertType?.toLowerCase().includes(type) || a.type===type) &&
+    (mp==='all' || a.mp===mp) &&
+    (country==='all' || a.country===country)
+  );
+  
+  const list = document.getElementById('alerts-list');
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty-state"><div class="empty-icon">✅</div><div>Sin alertas activas. Todas revisadas o sin escaneos aún.</div></div>';
+    return;
+  }
+  
+  list.innerHTML = filtered.map(a => {
+    const dotColor = a.type==='unauthorized'?'var(--danger)':a.imgTamper?'var(--purple)':a.priceAnomaly?'var(--warn)':'var(--warn)';
+    return `<div class="alert-item">
+      <div class="alert-dot" style="background:${dotColor}"></div>
+      <div>
+        <div class="alert-title">${a.title}</div>
+        <div class="alert-meta">
+          <span>${a.mpIcon||''} ${a.mp}</span>
+          <span>🏳️ ${a.country}</span>
+          <span>💰 USD ${a.price}</span>
+          <span>⭐ ${a.rating}</span>
+          <span>📅 ${new Date(a.date).toLocaleDateString('es')}</span>
+          ${a.url && a.url!=='#'?`<a href="${a.url}" target="_blank" class="link">Ver marketplace →</a>`:''}
+        </div>
+        <div class="alert-snippet">${a.snippet}</div>
+        <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap">
+          ${a.imgTamper?'<span class="badge b-purple">📸 Imagen alterada</span>':''}
+          ${a.priceAnomaly?'<span class="badge b-warn">⚠️ Precio anómalo</span>':''}
+          ${typeBadge(a.type)}
+          <span class="badge b-gray">Vendedor: ${a.seller}</span>
+        </div>
+      </div>
+      <div class="alert-actions">
+        <button class="btn btn-sm" onclick="reviewAlert('${a.id}')">Marcar revisado</button>
+        <button class="btn btn-sm btn-accent" onclick="viewFinding(${JSON.stringify(a).replace(/"/g,'&quot;')})">Detalle</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function reviewAlert(id) {
+  const a = alerts.find(a=>a.id===id);
+  if (a) { a.reviewed = true; a.reviewedDate = new Date().toISOString(); }
+  const f = findings.find(f=>f.id===id);
+  if (f) { f.reviewed = true; }
+  DB.set('alerts', alerts);
+  DB.set('findings', findings);
+  updateAlertBadge();
+  renderAlerts();
+  renderDashboard();
+}
+
+function clearAllAlerts() {
+  if (!confirm('¿Marcar todas las alertas como revisadas?')) return;
+  alerts.forEach(a => { a.reviewed = true; a.reviewedDate = new Date().toISOString(); });
+  DB.set('alerts', alerts);
+  updateAlertBadge();
+  renderAlerts();
+}
+
+function updateAlertBadge() {
+  const cnt = alerts.filter(a=>!a.reviewed).length;
+  const badge = document.getElementById('alert-badge');
+  badge.textContent = cnt;
+  badge.style.display = cnt > 0 ? 'inline-block' : 'none';
+  document.getElementById('d-alerts').textContent = cnt;
+}
+
+// ====================== FINDING DETAIL MODAL ======================
+function viewFinding(f) {
+  if (typeof f === 'string') f = JSON.parse(f);
+  activeFinding = f;
+  document.getElementById('finding-detail-content').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">PRODUCTO</div><div style="font-weight:600">${f.productName}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">MARKETPLACE</div><div>${f.mpIcon||''} ${f.mp}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">TÍTULO DEL LISTADO</div><div style="font-size:12px">${f.title}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">VENDEDOR</div><div>${f.seller}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">PAÍS</div><div>${f.country}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">PRECIO</div><div style="font-family:var(--mono);font-size:16px;font-weight:600">USD ${f.price}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">TIPO</div><div>${typeBadge(f.type)}</div></div>
+      <div><div style="font-size:10px;color:var(--text3);margin-bottom:2px">FECHA</div><div>${new Date(f.date).toLocaleString('es')}</div></div>
+    </div>
+    <div style="background:var(--bg3);border-radius:var(--r);padding:12px;margin-bottom:12px;font-size:12px;color:var(--text2);line-height:1.6">${f.snippet}</div>
+    ${f.imgTamper?'<div class="badge b-danger" style="margin-bottom:8px;font-size:11px;padding:5px 10px">⚠️ IMAGEN ALTERADA DETECTADA — Este listado usa una imagen que coincide con tus fotos oficiales pero modificada para evadir detección automática.</div>':''}
+    ${f.priceAnomaly?'<div class="badge b-warn" style="margin-bottom:8px;font-size:11px;padding:5px 10px">⚠️ PRECIO ANÓMALO — El precio es significativamente menor al precio base registrado. Posible producto adulterado o canal no autorizado.</div>':''}
+    ${f.matchedTerm&&f.matchedTerm!==f.productName?`<div style="font-size:11px;color:var(--text3);margin-bottom:8px">Término detectado: <strong style="color:var(--warn)">"${f.matchedTerm}"</strong> (variante del nombre oficial)</div>`:''}
+    ${f.url&&f.url!=='#'?`<a href="${f.url}" target="_blank" class="link" style="font-size:12px">🔗 Ver listado original en ${f.mp} →</a>`:''}`;
+  document.getElementById('finding-modal').style.display = 'flex';
+}
+
+function closeFindingModal() { document.getElementById('finding-modal').style.display = 'none'; }
+
+function markAsReviewed() {
+  if (!activeFinding) return;
+  reviewAlert(activeFinding.id);
+  closeFindingModal();
+}
+
+function escalateFinding() {
+  if (!activeFinding) return;
+  const f = activeFinding;
+  const txt = `ALERTA DE PROTECCIÓN DE MARCA — FuXion Biotech\n\nFecha: ${new Date(f.date).toLocaleString('es')}\nProducto: ${f.productName}\nMarketplace: ${f.mp}\nTítulo del listado: ${f.title}\nVendedor: ${f.seller}\nPaís: ${f.country}\nPrecio: USD ${f.price}\nTipo: ${f.type}\n${f.imgTamper?'\n⚠️ IMAGEN ALTERADA DETECTADA':''}\n${f.priceAnomaly?'\n⚠️ PRECIO ANÓMALO':''}\n\nAcción requerida: Verificar, documentar evidencia y proceder con denuncia en plataforma.`;
+  const blob = new Blob([txt], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `alerta_${f.productName}_${f.mp}_${new Date().toISOString().slice(0,10)}.txt`;
+  a.click();
+  closeFindingModal();
+}
+
+// ====================== MARKETPLACE TABLE ======================
+function renderMpTable() {
+  const body = document.getElementById('mp-table-body');
+  body.innerHTML = allMps().map(m => `
+    <tr>
+      <td><span style="display:flex;align-items:center;gap:8px"><span style="font-size:16px">${m.e}</span><strong>${m.n}</strong></span></td>
+      <td><span class="badge b-info">${m.r}</span></td>
+      <td><a href="${m.url||'#'}" target="_blank" class="link">${m.url||'—'}</a></td>
+      <td><span class="badge b-green">Activo</span></td>
+      <td>${m.preset?'<span class="badge b-gray">Predefinido</span>':'<span class="badge b-purple">Custom</span>'}</td>
+      <td>${!m.preset?`<button class="btn btn-danger btn-sm" onclick="deleteMp('${m.id}')">Eliminar</button>`:'—'}</td>
+    </tr>`).join('');
+}
+
+function openMpModal() { document.getElementById('mp-modal').style.display = 'flex'; }
+function closeMpModal() { document.getElementById('mp-modal').style.display = 'none'; }
+
+function saveMp() {
+  const name = document.getElementById('mp-name').value.trim();
+  if (!name) { alert('El nombre es obligatorio.'); return; }
+  customMps.push({
+    id: 'cm_'+Date.now(),
+    n: name,
+    url: document.getElementById('mp-url').value.trim(),
+    r: document.getElementById('mp-region').value,
+    country: document.getElementById('mp-country').value.trim(),
+    e: document.getElementById('mp-icon').value.trim() || '🏪',
+    c: document.getElementById('mp-color').value,
+    preset: false,
+  });
+  DB.set('custom_mps', customMps);
+  closeMpModal();
+  renderMpTable();
+}
+
+function deleteMp(id) {
+  if (!confirm('¿Eliminar este marketplace?')) return;
+  customMps = customMps.filter(m => m.id !== id);
+  DB.set('custom_mps', customMps);
+  renderMpTable();
+}
+
+// ====================== CONFIG ======================
+function renderConfig() {
+  document.getElementById('cfg-company').value = config.company || 'FuXion Biotech';
+  document.getElementById('cfg-email').value = config.email || '';
+  document.getElementById('cfg-responsible').value = config.responsible || '';
+  document.getElementById('cfg-countries').value = config.countries || 'PE,CO,MX,CL,AR';
+  document.getElementById('cfg-price-threshold').value = config.priceThreshold || 60;
+  document.getElementById('cfg-img-threshold').value = config.imgThreshold || 75;
+  document.getElementById('cfg-rating-threshold').value = config.ratingThreshold || 3.5;
+  
+  // Variant examples
+  if (products.length) {
+    const ex = generateVariants(products[0].name).slice(0,10);
+    document.getElementById('variant-examples').innerHTML = ex.map(v=>`<span class="variant-tag">${v}</span>`).join('');
+  } else {
+    document.getElementById('variant-examples').innerHTML = '<span style="color:var(--text3);font-size:12px">Agrega un producto para ver ejemplos de variantes.</span>';
+  }
+  
+  // Storage stats
+  document.getElementById('storage-stats').innerHTML = `
+    Productos: <strong>${products.length}</strong><br>
+    Hallazgos: <strong>${findings.length}</strong><br>
+    Alertas activas: <strong>${alerts.filter(a=>!a.reviewed).length}</strong><br>
+    Marketplaces custom: <strong>${customMps.length}</strong>`;
+}
+
+function saveConfig() {
+  config = {
+    company: document.getElementById('cfg-company').value,
+    email: document.getElementById('cfg-email').value,
+    responsible: document.getElementById('cfg-responsible').value,
+    countries: document.getElementById('cfg-countries').value,
+    priceThreshold: parseFloat(document.getElementById('cfg-price-threshold').value),
+    imgThreshold: parseFloat(document.getElementById('cfg-img-threshold').value),
+    ratingThreshold: parseFloat(document.getElementById('cfg-rating-threshold').value),
+  };
+  DB.set('config', config);
+  alert('✅ Configuración guardada.');
+}
+
+function clearAllData() {
+  if (!confirm('⚠️ Esto borrará TODOS los datos. ¿Continuar?')) return;
+  ['products','findings','alerts','custom_mps','config'].forEach(k => localStorage.removeItem('fuxion_'+k));
+  location.reload();
+}
+
+// ====================== EXPORT ======================
+function exportCSV() { exportCSVData(scanResults, 'escaneo_fuxion'); }
+
+function exportCSVData(data, filename) {
+  if (!data.length) { alert('Sin datos para exportar.'); return; }
+  const headers = ['Fecha','Producto','Marketplace','País','Título','Vendedor','Precio','Tipo','Img. Alterada','Precio Anómalo','Estado'];
+  const rows = data.map(r => [
+    new Date(r.date).toLocaleDateString('es'), r.productName, r.mp, r.country,
+    `"${r.title.replace(/"/g,"'")}"`, r.seller, r.price, r.type,
+    r.imgTamper?'Sí':'No', r.priceAnomaly?'Sí':'No', r.reviewed?'Revisado':'Pendiente'
+  ]);
+  const csv = [headers, ...rows].map(r=>r.join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${filename}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+}
+
+function exportAlertsReport() {
+  const activeAlerts = alerts.filter(a=>!a.reviewed);
+  if (!activeAlerts.length) { alert('Sin alertas activas.'); return; }
+  exportCSVData(activeAlerts, 'alertas_fuxion');
+}
+
+function exportAllData() {
+  const data = { products, findings, alerts, customMps, config, exported: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `fuxion_monitor_backup_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+}
+
+// ====================== HELPERS ======================
+function typeBadge(type) {
+  const map = { official:'<span class="badge b-green">Oficial</span>', reseller:'<span class="badge b-warn">Revendedor</span>', unauthorized:'<span class="badge b-danger">No autorizado</span>', suspicious:'<span class="badge b-purple">Sospechoso</span>' };
+  return map[type] || '<span class="badge b-gray">Desconocido</span>';
+}
+
+// ====================== INIT ======================
+document.addEventListener('DOMContentLoaded', () => {
+  renderDashboard();
+  renderCatalog();
+  updateAlertBadge();
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('es', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+});
+</script>
+</body>
+</html>
